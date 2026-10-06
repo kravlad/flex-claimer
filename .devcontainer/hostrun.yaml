@@ -42,3 +42,147 @@ rules:
     positional:
       # force refspecs (+ref), deletions (:ref), and remotes other than by name
       deny: ["+*", ":*", "*://*", "*@*:*", "/*", ".*", "~*", "ext::*", "file:*"]
+
+  # gh for the issue tracker (docs/agents/issue-tracker.md): one rule per
+  # subcommand it needs, each with a strict flag list. A flag list with
+  # `allow: []` allows no flag but those under `values`; a positional one
+  # allows no positional argument. Kept out on purpose:
+  # - -R/--repo and a "/" (URLs, owner/repo#n) in an argument or in the
+  #   issue a flag links to (--parent, --blocked-by, …): another
+  #   repository under the host's token. Not a guarantee: gh takes the
+  #   repository from the git remotes of the directory it runs in, which
+  #   the container can write.
+  # - --body-file <path>, --attach, --recover: they read a file on the
+  #   host. --body-file takes only "-", the stdin hostrun streams.
+  # - -q/--jq: gh's jq gives away the host's environment (env, $ENV). Pipe
+  #   the JSON to jq in the container instead.
+  # - --web, --editor: they start a program on the host.
+  # - gh api: it can do anything the host's token allows.
+  - command: gh issue list
+    flags:
+      allow: []
+      values:
+        --state: {}
+        -s: {}
+        --label: {}
+        -l: {}
+        --assignee: {}
+        -a: {}
+        --search: {}
+        -S: {}
+        --limit: {}
+        -L: {}
+        --json: {}
+    positional:
+      allow: []
+
+  - command: gh issue view
+    flags:
+      allow: [--comments, -c]
+      values:
+        --json: {}
+    positional:
+      deny: ["*/*"]
+
+  - command: gh issue create
+    flags:
+      allow: []
+      values:
+        --title: {}
+        -t: {}
+        --body: {}
+        -b: {}
+        --body-file: { allow: ["-"] }
+        -F: { allow: ["-"] }
+        --label: {}
+        -l: {}
+        --parent: { deny: ["*/*"] }
+        --blocked-by: { deny: ["*/*"] }
+    positional:
+      allow: []
+
+  - command: gh issue edit
+    flags:
+      allow: []
+      values:
+        --title: {}
+        -t: {}
+        --body: {}
+        -b: {}
+        --body-file: { allow: ["-"] }
+        -F: { allow: ["-"] }
+        --add-label: {}
+        --remove-label: {}
+        --add-assignee: {}
+        --remove-assignee: {}
+        --add-sub-issue: { deny: ["*/*"] }
+        --remove-sub-issue: { deny: ["*/*"] }
+        --add-blocked-by: { deny: ["*/*"] }
+        --remove-blocked-by: { deny: ["*/*"] }
+    positional:
+      deny: ["*/*"]
+
+  - command: gh issue comment
+    flags:
+      allow: []
+      values:
+        --body: {}
+        -b: {}
+        --body-file: { allow: ["-"] }
+        -F: { allow: ["-"] }
+    positional:
+      deny: ["*/*"]
+
+  - command: gh issue close
+    flags:
+      allow: []
+      values:
+        --comment: {}
+        -c: {}
+        --reason: {}
+        -r: {}
+    positional:
+      deny: ["*/*"]
+
+  - command: gh pr view
+    flags:
+      allow: [--comments, -c]
+      values:
+        --json: {}
+    positional:
+      deny: ["*/*"]
+
+  - command: gh pr diff
+    flags:
+      allow: [--name-only, --patch]
+    positional:
+      deny: ["*/*"]
+
+  - command: gh pr comment
+    flags:
+      allow: []
+      values:
+        --body: {}
+        -b: {}
+        --body-file: { allow: ["-"] }
+        -F: { allow: ["-"] }
+    positional:
+      deny: ["*/*"]
+
+  - command: gh pr edit
+    flags:
+      allow: []
+      values:
+        --add-label: {}
+        --remove-label: {}
+    positional:
+      deny: ["*/*"]
+
+  - command: gh pr close
+    flags:
+      allow: []
+      values:
+        --comment: {}
+        -c: {}
+    positional:
+      deny: ["*/*"]
