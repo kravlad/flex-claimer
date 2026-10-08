@@ -1,5 +1,6 @@
 ---
 label: Seven-day account pause — canceled blocks
+group: Check-in & standing
 hint: Request a review of a seven-day account pause for a high volume of canceled blocks. Check that the cancellations were within the permitted window.
 subject: Request for review of seven-day account pause — canceled blocks
 ---
