@@ -7,5 +7,10 @@ description = "Install what the agent needs in the Claude Code container"
 run = "mise install"
 
 [tasks.build]
-description = "Generate data.js from config.json, translations/ru.json and templates/*.md"
+description = "Build the self-contained index.html from src/, config.json, translations/ and templates/"
 run = "node build.mjs"
+
+[tasks.serve]
+description = "Build, then serve the page on http://127.0.0.1:8000 (PORT to change)"
+depends = ["build"]
+run = "node serve.mjs"
