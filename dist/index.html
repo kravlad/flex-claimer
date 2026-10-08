@@ -158,6 +158,7 @@ window.FLEX_CLAIMER_DATA = {
       "standing",
       "undelivered",
       "noAccess",
+      "noAccessNoAnswer",
       "damaged",
       "oldIssues",
       "onTime",
@@ -190,6 +191,8 @@ window.FLEX_CLAIMER_DATA = {
       "Incorrect standing issue": "Ошибка в standing",
       "Undelivered packages — route exceeded the block": "Недоставленные — маршрут не уложился в блок",
       "Undelivered packages — no access after 8 PM": "Недоставленные — нет доступа после 20:00",
+      "Undelivered packages — no access, customer did not answer": "Недоставленные — нет доступа, клиент не ответил",
+      "For packages undelivered because there was no access and the customer did not answer your call. Describe the delivery attempt.": "Для недоставленных посылок из-за отсутствия доступа, когда клиент не ответил на звонок. Укажи обстоятельства попытки доставки.",
       "Damaged package — returned to the station": "Повреждённая посылка — возвращена на склад",
       "Undelivered packages — entries older than 2 months": "Недоставленные — записи старше 2 месяцев",
       "Delivered on time — incorrect late marks": "Доставлено вовремя — ошибочное опоздание",
@@ -294,7 +297,13 @@ window.FLEX_CLAIMER_DATA = {
       "label": "Undelivered packages — no access after 8 PM",
       "hint": "For packages undelivered because there was no access after 8 PM and customer calls were not permitted. Describe the delivery attempt.",
       "subject": "Remove undelivered-package entries — no access — {{date}}, {{start}}",
-      "body": "Hello Amazon Flex Support,\n\nI am requesting the removal of undelivered-package entries from my standing for my block on {{block}}.\n\nI could not complete these deliveries for a valid reason: there was no access to the building or delivery location. The delivery attempts took place after 8:00 PM, when I was not permitted to call the customers to obtain access.\n\nThese packages were not left undelivered because I refused to deliver them. The access restrictions and the restriction on contacting customers prevented me from completing the deliveries.\n\nPlease review the delivery attempts and the circumstances described in this email. Remove these undelivered-package entries from my delivery history and correct my standing, as the deliveries could not be completed for reasons outside my control.\n\nPlease confirm that the entries have been removed and my standing has been corrected."
+      "body": "Hello Amazon Flex Support,\n\nI am requesting the removal of undelivered-package entries from my standing for my block on {{block}}.\n\nI could not complete these deliveries for a valid reason: there was no access to the building or delivery location. The delivery attempts took place after 8:00 PM, when I was not permitted to call the customers to obtain access. There was also no safe place to leave the packages.\n\nThese packages were not left undelivered because I refused to deliver them. The access restrictions and the restriction on contacting customers prevented me from completing the deliveries.\n\nPlease review the delivery attempts and the circumstances described in this email. Remove these undelivered-package entries from my delivery history and correct my standing, as the deliveries could not be completed for reasons outside my control.\n\nPlease confirm that the entries have been removed and my standing has been corrected."
+    },
+    "noAccessNoAnswer": {
+      "label": "Undelivered packages — no access, customer did not answer",
+      "hint": "For packages undelivered because there was no access and the customer did not answer your call. Describe the delivery attempt.",
+      "subject": "Remove undelivered-package entries — no access — {{date}}, {{start}}",
+      "body": "Hello Amazon Flex Support,\n\nI am requesting the removal of undelivered-package entries from my standing for my block on {{block}}.\n\nI could not complete these deliveries for a valid reason: there was no access to the building or delivery location. I tried to call the customer to obtain access, but they did not answer. There was also no safe place to leave the packages.\n\nThese packages were not left undelivered because I refused to deliver them. The access restrictions and the lack of a response from the customer prevented me from completing the deliveries.\n\nPlease review the delivery attempts and the circumstances described in this email. Remove these undelivered-package entries from my delivery history and correct my standing, as the deliveries could not be completed for reasons outside my control.\n\nPlease confirm that the entries have been removed and my standing has been corrected."
     },
     "damaged": {
       "label": "Damaged package — returned to the station",

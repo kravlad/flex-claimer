@@ -11,6 +11,8 @@
   "Incorrect standing issue": "Ошибка в standing",
   "Undelivered packages — route exceeded the block": "Недоставленные — маршрут не уложился в блок",
   "Undelivered packages — no access after 8 PM": "Недоставленные — нет доступа после 20:00",
+  "Undelivered packages — no access, customer did not answer": "Недоставленные — нет доступа, клиент не ответил",
+  "For packages undelivered because there was no access and the customer did not answer your call. Describe the delivery attempt.": "Для недоставленных посылок из-за отсутствия доступа, когда клиент не ответил на звонок. Укажи обстоятельства попытки доставки.",
   "Damaged package — returned to the station": "Повреждённая посылка — возвращена на склад",
   "Undelivered packages — entries older than 2 months": "Недоставленные — записи старше 2 месяцев",
   "Delivered on time — incorrect late marks": "Доставлено вовремя — ошибочное опоздание",

@@ -7,7 +7,7 @@ Hello Amazon Flex Support,
 
 I am requesting the removal of undelivered-package entries from my standing for my block on {{block}}.
 
-I could not complete these deliveries for a valid reason: there was no access to the building or delivery location. The delivery attempts took place after 8:00 PM, when I was not permitted to call the customers to obtain access.
+I could not complete these deliveries for a valid reason: there was no access to the building or delivery location. The delivery attempts took place after 8:00 PM, when I was not permitted to call the customers to obtain access. There was also no safe place to leave the packages.
 
 These packages were not left undelivered because I refused to deliver them. The access restrictions and the restriction on contacting customers prevented me from completing the deliveries.
 
