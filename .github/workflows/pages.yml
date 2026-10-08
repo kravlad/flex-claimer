@@ -1,0 +1,53 @@
+# Builds dist/index.html from the sources (scripts/build.mjs) and publishes dist/ to GitHub Pages
+# on every push to main. Repository setting: Settings > Pages > Build and deployment > Source: GitHub Actions.
+# Action versions follow the GitHub Pages custom workflow docs:
+# https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer push waits instead of cancelling a deployment in progress.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Node
+        # Exact tag: the floating v7 tag points to a release newer than the project's 5-day cooldown.
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '22' # same major as mise.toml
+      - name: Build dist/index.html
+        run: node scripts/build.mjs
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
