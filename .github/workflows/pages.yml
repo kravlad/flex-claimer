@@ -31,7 +31,8 @@ jobs:
       - name: Build dist/index.html
         run: node scripts/build.mjs
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        # v6 instead of the docs' v5: v5 runs on the deprecated Node 20 runtime, v6 on Node 24.
+        uses: actions/configure-pages@v6
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
