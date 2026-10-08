@@ -9,20 +9,6 @@
       "checked": false
     }
   },
-  "issueTypes": [
-    "late",
-    "standing",
-    "undelivered",
-    "noAccess",
-    "noAccessNoAnswer",
-    "damaged",
-    "oldIssues",
-    "onTime",
-    "minorLate",
-    "payment",
-    "overtime",
-    "custom"
-  ],
   "emailText": {
     "missingDate": "[block date]",
     "overnight": "ending the following day",

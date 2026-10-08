@@ -4,7 +4,7 @@
   const STORAGE_KEY = 'flex-claimer.preferences.v1';
   const {config,translations,templates} = window.FLEX_CLAIMER_DATA;
   const russian = translations.ru;
-  for (const key of config.issueTypes) {
+  for (const key of Object.keys(templates)) {
     const option = document.createElement('option');
     option.value = key;option.textContent = templates[key].label;option.setAttribute('data-i18n','');
     $('type').append(option);
@@ -44,7 +44,7 @@
   function updateRecipientHint() {
     $('recipientHint').textContent=uniqueAddresses(selectedRecipientInputs()).join(', ');
   }
-  const defaults = Object.fromEntries(config.issueTypes.map(key=>[key,templates[key]]));
+  const defaults = templates;
   const emailText = config.emailText;
   let preferences = {templates:{}};
   try {
