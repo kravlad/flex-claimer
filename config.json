@@ -1,0 +1,34 @@
+{
+  "recipients": {
+    "support": {
+      "address": "flex-representative-support@amazon.com",
+      "checked": true
+    },
+    "jeff": {
+      "address": "jeff@amazon.com",
+      "checked": false
+    }
+  },
+  "issueTypes": [
+    "late",
+    "standing",
+    "undelivered",
+    "noAccess",
+    "damaged",
+    "oldIssues",
+    "onTime",
+    "minorLate",
+    "payment",
+    "overtime",
+    "custom"
+  ],
+  "emailText": {
+    "missingDate": "[block date]",
+    "overnight": "ending the following day",
+    "endingAt": "ending at",
+    "stationLabel": "Station:",
+    "detailsLabel": "Additional details:",
+    "unknownStartTime": "Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.",
+    "signoff": "Thank you,"
+  }
+}

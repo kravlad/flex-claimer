@@ -1,6 +1,11 @@
 [tools]
 "github:kravlab/hostrunner" = "0.2.0"
+node = "22"
 
 [tasks.setup-agent]
 description = "Install what the agent needs in the Claude Code container"
 run = "mise install"
+
+[tasks.build]
+description = "Generate data.js from config.json, translations/ru.json and templates/*.md"
+run = "node build.mjs"

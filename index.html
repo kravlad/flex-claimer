@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Flex Claimer — contact support</title>
+  <meta name="description" content="Create Amazon Flex support emails with editable templates, block details, and your choice of recipients. English and Russian interface.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23156955'/%3E%3Cpath d='M8 10h16v12H8zM8 10l8 7 8-7' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root{--ink:#18242b;--muted:#66767e;--line:#dae2e4;--paper:#fff;--bg:#f2f5f4;--accent:#156955;--soft:#e8f2ed;--orange:#eea34b;--radius:20px}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}button,a,input,select,textarea{ -webkit-tap-highlight-color:transparent}button{cursor:pointer}
+    .wrap{max-width:1180px;margin:auto;padding:32px 32px 24px}.brand{display:flex;align-items:center;gap:12px;font-weight:750;letter-spacing:-.5px;font-size:22px}.mark{height:35px;width:35px;border-radius:11px;background:var(--accent);color:white;display:grid;place-items:center;font-size:22px}.brand span:last-child{color:var(--muted);font-size:13px;font-weight:450;letter-spacing:0;margin-left:auto}
+    header{margin:44px 0 30px}h1{font-size:clamp(28px,4vw,42px);letter-spacing:-1.4px;line-height:1.15;margin:0 0 13px}header p{color:var(--muted);margin:0;max-width:650px}.eyebrow{font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:1.7px;color:var(--accent);margin:0 0 12px}
+    main{display:grid;grid-template-columns:minmax(0, .92fr) minmax(0,1.08fr);gap:24px;align-items:start}.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);overflow:hidden}.card-head{padding:24px 26px 0;display:flex;gap:12px;align-items:center}.step{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--soft);font-size:12px;font-weight:750;color:var(--accent);flex:none}h2{font-size:18px;margin:0;letter-spacing:-.4px}.fields{padding:24px 26px 26px}.field{margin-bottom:19px}label,.field-label{display:block;font-weight:600;font-size:13px;margin-bottom:7px}.optional{font-weight:400;color:var(--muted)}input,select,textarea{width:100%;border:1px solid #cbd6d8;border-radius:10px;padding:11px 12px;color:var(--ink);background:#fff;min-width:0}input:focus,select:focus,textarea:focus{outline:3px solid #15695522;border-color:var(--accent)}input:invalid:not(:placeholder-shown){box-shadow:none}textarea{resize:vertical;line-height:1.65}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.hint{color:var(--muted);font-size:12px;margin:6px 0 0}.type-hint{padding:12px 14px;background:var(--soft);border-radius:10px;font-size:12px;color:#365e51;margin:10px 0 21px}
+    details{border-top:1px solid var(--line);padding-top:17px;margin-top:8px}summary{font-size:13px;font-weight:650;cursor:pointer}details .inner{margin-top:17px}.chips{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0 16px}.chips code{padding:3px 7px;background:var(--bg);border-radius:5px;font-size:11px;color:var(--accent)}#templateBody{font-family:ui-monospace,monospace;font-size:12px;min-height:190px}.template-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .preview .fields{padding-bottom:20px}.preview label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}.preview input{font-size:14px}#body{min-height:330px;font-size:14px}.preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%}.badge{font-size:11px;color:var(--accent);background:var(--soft);padding:4px 9px;border-radius:30px;white-space:nowrap}.action-area{padding:20px 26px 24px;background:#f9fbfa;border-top:1px solid var(--line)}.buttons{display:flex;gap:10px}.btn{border:1px solid var(--line);border-radius:10px;padding:11px 16px;font-size:13px;font-weight:650;background:#fff;color:var(--ink);display:inline-flex;justify-content:center;align-items:center;gap:8px;text-decoration:none;min-height:44px}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;flex:1}.btn:hover{filter:brightness(.96)}.btn:focus-visible,summary:focus-visible{outline:3px solid var(--orange);outline-offset:3px}.btn.small{font-size:12px;padding:7px 11px;min-height:36px}.action-area p{font-size:12px;color:var(--muted);margin:12px 0 0}.note{margin:20px 0 0;display:flex;gap:9px;font-size:12px;color:var(--muted)}footer{margin-top:30px;display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:11px}.notice{font-size:13px;background:#fff4df;color:#73521d;padding:12px;border-radius:10px;margin-bottom:15px}.notice .btn{margin-top:8px}.error{color:#a43030;font-size:13px;margin:10px 0 0;white-space:pre-line}.status{font-size:12px;color:var(--accent);margin-top:10px;min-height:18px}.hidden,[hidden]{display:none!important}.help{margin-top:18px;font-size:12px;color:var(--muted)}.help summary{font-size:12px}.help p{margin:12px 0 0}
+    @media(max-width:800px){.wrap{padding:22px 18px}main{grid-template-columns:1fr}header{margin:30px 0 24px}h1{letter-spacing:-.8px}.brand span:last-child{display:none}.card-head{padding:21px 20px 0}.fields{padding:20px}.action-area{padding:20px}footer{flex-direction:column;gap:4px}#body{min-height:360px}}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px}.language-picker{display:flex;align-items:center;gap:8px;flex:none}.language-picker label{margin:0;color:var(--muted);font-size:12px}.language-picker select{width:auto;padding:7px 10px;font-size:13px;min-height:44px}.brand{flex:1}.brand span:last-child{margin-left:20px}#recipientHint{overflow-wrap:anywhere}
+    .recipient-group{border:0;padding:0;min-width:0}.recipient-group legend{padding:0;margin:0 0 7px;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px}.recipient-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.recipient-row input[type=email]{flex:1;min-width:0}.recipient-toggle{display:flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin:0;border-radius:10px;background:var(--soft);cursor:pointer}.recipient-toggle input[type=checkbox]{width:21px;height:21px;margin:0;padding:0;accent-color:var(--accent)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .card,.field,main>div,.fields{min-width:0}.row{grid-template-columns:repeat(2,minmax(0,1fr))}input,select,textarea{max-width:100%}.native-input{display:flex;align-items:center;width:100%;max-width:100%;min-width:0;min-height:48px;padding:11px 12px;border:1px solid #cbd6d8;border-radius:10px;background:#fff;overflow:hidden}.native-input:focus-within{outline:3px solid #15695522;border-color:var(--accent)}.native-input input[type=date],.native-input input[type=time]{display:block;flex:1;min-width:0;min-inline-size:0;width:100%;max-width:100%;height:24px;min-height:24px;margin:0;padding:0;border:0;border-radius:0;background:transparent;-webkit-appearance:none;appearance:none}.native-input input:focus{outline:none}.native-input input::-webkit-date-and-time-value{min-width:0;text-align:left}
+    @media(max-width:600px){main{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:minmax(0,1fr);gap:0}.buttons{flex-direction:column}input,select,textarea,.preview input,#body,#templateBody{font-size:16px}.preview-top{flex-wrap:wrap}}
+    @media(max-width:380px){.row{grid-template-columns:1fr}.buttons{flex-direction:column}.wrap{padding:18px 12px}.language-picker label{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar"><div class="brand"><span class="mark" aria-hidden="true">↗</span>Flex Claimer<span data-i18n>A support email · in a few minutes</span></div><div class="language-picker"><label for="language" data-i18n>Language</label><select id="language" aria-label="Language / Язык"><option value="ru">RU</option><option value="en" selected>EN</option></select></div></div>
+    <header><p class="eyebrow" data-i18n>Amazon Flex · driver assistant</p><h1 data-i18n>Tell us what happened.</h1><p data-i18n>Choose an issue and enter your block details. Get an email draft to review and open in your mail app.</p></header>
+    <main>
+      <section class="card" aria-labelledby="blockHeading">
+        <div class="card-head"><span class="step">01</span><h2 id="blockHeading" data-i18n>Issue and block</h2></div>
+        <form id="blockForm" class="fields">
+          <div class="field"><label for="type" data-i18n>Issue type</label><select id="type"></select><p class="type-hint" id="typeHint"></p></div>
+          <div class="field"><label for="date" data-i18n>Block date</label><div class="native-input"><input type="date" id="date" required></div><p class="hint" data-i18n>Use the station’s local date and time.</p></div>
+          <div class="row"><div class="field"><label for="start"><span data-i18n>Block start time</span> <span class="optional" data-i18n>· optional</span></label><div class="native-input"><input type="time" id="start"></div></div><div class="field"><label for="end"><span data-i18n>End time</span> <span class="optional" data-i18n>· optional</span></label><div class="native-input"><input type="time" id="end"></div></div></div>
+          <div class="field"><label for="station"><span data-i18n>Station</span> <span class="optional" data-i18n>· optional</span></label><input id="station" maxlength="120" placeholder="For example, DAX5" data-i18n-placeholder autocomplete="off"></div>
+          <div class="field"><label for="name"><span data-i18n>Name for signature</span> <span class="optional" data-i18n>· optional</span></label><input id="name" maxlength="120" placeholder="As shown in your Amazon Flex account" data-i18n-placeholder autocomplete="name"></div>
+          <div class="field"><label for="details"><span data-i18n>What happened</span> <span class="optional" data-i18n>· optional</span></label><textarea id="details" rows="3" placeholder="Details in English: arrival time, app error, contact with support…" data-i18n-placeholder></textarea><p class="hint" data-i18n>These details will be added to the email without translation.</p></div>
+          <details id="templateEditor"><summary data-i18n>Edit template</summary><div class="inner"><p class="hint" data-i18n>Edit the template for this issue type and save it in this browser.</p><div class="chips" aria-label="Template variables" data-i18n-aria><code>{{date}}</code><code>{{start}}</code><code>{{end}}</code><code>{{block}}</code><code>{{station}}</code><code>{{name}}</code><code>{{details}}</code></div><div class="field"><label for="templateSubject" data-i18n>Subject template</label><input id="templateSubject"></div><label for="templateBody" data-i18n>Email template</label><textarea id="templateBody" spellcheck="false"></textarea><p class="hint" data-i18n>{{block}} includes the date and time. An end time earlier than the start means the block ends the next day. Station details, additional information, and your signature are appended automatically if their variables are not in the template.</p><div class="template-actions"><button type="button" class="btn small" id="saveTemplate" data-i18n>Apply and save</button><button type="button" class="btn small" id="resetTemplate" data-i18n>Restore default</button></div><p class="status" id="templateStatus" role="status"></p></div></details>
+        </form>
+      </section>
+      <div>
+        <section class="card preview" aria-labelledby="emailHeading"><div class="card-head"><span class="step">02</span><div class="preview-top"><h2 id="emailHeading" data-i18n>Your email</h2><span class="badge" id="draftBadge">Template</span></div></div>
+          <div class="fields"><div id="pendingNotice" class="notice" hidden><span data-i18n>The block details have changed. Update the email to use them. This will replace your manual edits.</span><br><button id="regenerate" type="button" class="btn small" data-i18n>Update from template</button></div>
+            <fieldset class="field recipient-group" aria-describedby="recipientHelp recipientHint"><legend data-i18n>To</legend><div class="recipient-row"><label class="recipient-toggle" for="sendSupport"><input type="checkbox" id="sendSupport"><span class="sr-only" data-i18n>Select the first address</span></label><input type="email" id="emailSupport" readonly required maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="First email address" data-i18n-aria></div><div class="recipient-row"><label class="recipient-toggle" for="sendJeff"><input type="checkbox" id="sendJeff"><span class="sr-only" data-i18n>Select the second address</span></label><input type="email" id="emailJeff" readonly required maxlength="254" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Second email address" data-i18n-aria></div><label for="emailCustom" data-i18n>Other email address</label><div class="recipient-row"><label class="recipient-toggle" for="sendCustom"><input type="checkbox" id="sendCustom"><span class="sr-only" data-i18n>Select the other address</span></label><input type="email" id="emailCustom" required maxlength="254" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" aria-label="Other email address" data-i18n-aria></div><p id="recipientHelp" class="hint" data-i18n>Select recipients. Amazon addresses are fixed; you can add another email below.</p><p id="recipientHint" class="hint"></p></fieldset>
+            <div class="field"><label for="subject" data-i18n>Subject</label><input id="subject" aria-describedby="previewHelp"></div>
+            <label for="body" data-i18n>Email body</label><textarea id="body" aria-describedby="previewHelp" spellcheck="true" lang="en"></textarea><p class="hint" id="previewHelp" data-i18n>You can edit the subject and body. Check that every statement matches your situation.</p><p id="error" class="error" role="alert"></p>
+          </div>
+          <div class="action-area"><div class="buttons"><button type="button" class="btn primary" id="createEmail"><span aria-hidden="true">↗</span><span data-i18n>Create email</span></button><button type="button" class="btn" id="copy" data-i18n>Copy text</button></div><p data-i18n>Your mail app will open with the recipients, subject, and body filled in. You send the email from there.</p><div id="actionStatus" class="status" role="status"></div><details class="help"><summary data-i18n>If your mail app does not open</summary><p data-i18n>Set up your default mail app, or copy the text into a new email. Attach photos and other evidence in your mail app. Very long emails may not transfer in full — check the draft before sending.</p></details></div>
+        </section>
+        <p class="note"><span aria-hidden="true">◉</span><span data-i18n>The page works without a network connection. Templates, your name, and your language preference are saved only in this browser, if storage is allowed.</span></p>
+      </div>
+    </main>
+    <footer><span data-i18n>Flex Claimer · independent tool</span><span data-i18n>Not affiliated with Amazon. Add attachments in your mail app.</span></footer>
+  </div>
+  <script src="vendor/handlebars.min.js"></script>
+  <script src="templating.js"></script>
+  <script src="data.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const STORAGE_KEY = 'flex-claimer.preferences.v1';
+    const {config,translations,templates} = window.FLEX_CLAIMER_DATA;
+    const russian = translations.ru;
+    for (const key of config.issueTypes) {
+      const option = document.createElement('option');
+      option.value = key;option.textContent = templates[key].label;option.setAttribute('data-i18n','');
+      $('type').append(option);
+    }
+    let language = 'en';
+    const staticText = [...document.querySelectorAll('[data-i18n]')].map(el=>({el,source:el.textContent}));
+    const translatedAttributes = [
+      ...[...document.querySelectorAll('[data-i18n-placeholder]')].map(el=>({el,attribute:'placeholder',source:el.getAttribute('placeholder')})),
+      ...[...document.querySelectorAll('[data-i18n-aria]')].map(el=>({el,attribute:'aria-label',source:el.getAttribute('aria-label')}))
+    ];
+    const dynamicText = new Map();
+    const t = text => language === 'ru' ? (russian[text] ?? text) : text;
+    function setUiText(id,source,suffix='') {
+      dynamicText.set(id,{source,suffix});
+      $(id).textContent=t(source)+suffix;
+    }
+    function applyLanguage() {
+      document.documentElement.lang=language;
+      document.title=t('Flex Claimer — contact support');
+      $('language').value=language;
+      for(const {el,source} of staticText)el.textContent=t(source);
+      for(const {el,attribute,source} of translatedAttributes)el.setAttribute(attribute,t(source));
+      for(const [id,{source,suffix}] of dynamicText)$(id).textContent=t(source)+suffix;
+    }
+    const recipientRows = [{checkbox:'sendSupport',email:'emailSupport'},{checkbox:'sendJeff',email:'emailJeff'},{checkbox:'sendCustom',email:'emailCustom'}];
+    function selectedRecipientInputs() {
+      return recipientRows.filter(row=>$(row.checkbox).checked).map(row=>$(row.email));
+    }
+    function uniqueAddresses(inputs) {
+      const seen=new Set();
+      return inputs.map(input=>input.value.trim()).filter(address=>{
+        const key=address.toLowerCase();
+        if(!address||seen.has(key))return false;
+        seen.add(key);return true;
+      });
+    }
+    function updateRecipientHint() {
+      $('recipientHint').textContent=uniqueAddresses(selectedRecipientInputs()).join(', ');
+    }
+    const defaults = Object.fromEntries(config.issueTypes.map(key=>[key,templates[key]]));
+    const emailText = config.emailText;
+    let preferences = {templates:{}};
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        for (const key of Object.keys(defaults)) {
+          const t = saved.templates?.[key];
+          if (t && typeof t.subject === 'string' && typeof t.body === 'string' && !FlexTemplating.check(t.subject) && !FlexTemplating.check(t.body)) preferences.templates[key] = {subject:t.subject,body:t.body};
+        }
+        if(typeof saved.name === 'string')preferences.name=saved.name;
+        if(saved.language==='en'||saved.language==='ru')preferences.language=saved.language;
+        if(saved.addresses&&typeof saved.addresses==='object'){
+          preferences.addresses={};
+          if(typeof saved.addresses.custom==='string')preferences.addresses.custom=saved.addresses.custom.slice(0,254);
+        }
+      }
+    } catch {}
+    $('name').value = preferences.name || '';
+    $('sendSupport').checked=config.recipients.support.checked;$('sendJeff').checked=config.recipients.jeff.checked;$('sendCustom').checked=false;
+    $('emailSupport').value=config.recipients.support.address;
+    $('emailJeff').value=config.recipients.jeff.address;
+    $('emailCustom').value=preferences.addresses?.custom ?? '';
+    language=preferences.language || 'en';
+    let edited = false, pending = false;
+    function savePreferences() {
+      preferences.name = $('name').value.trim();
+      preferences.language = language;
+      preferences.addresses={custom:$('emailCustom').value.trim()};
+      try {localStorage.setItem(STORAGE_KEY,JSON.stringify(preferences));return true;} catch {return false;}
+    }
+    function activeTemplate(){return preferences.templates[$('type').value] || defaults[$('type').value];}
+    function formatDate(value){
+      if (!value) return emailText.missingDate;
+      const [y,m,d] = value.split('-').map(Number);
+      return new Intl.DateTimeFormat('en-US',{year:'numeric',month:'long',day:'numeric'}).format(new Date(y,m-1,d,12));
+    }
+    function formatTime(value){
+      if (!value) return '';
+      const [h,m] = value.split(':').map(Number);
+      return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'AM' : 'PM'}`;
+    }
+    function values(){
+      const date=formatDate($('date').value),start=formatTime($('start').value),end=$('end').value ? formatTime($('end').value):'';
+      const overnight=$('end').value && $('start').value && $('end').value < $('start').value;
+      const time=start ? `, ${start}${end ? `–${end}${overnight?` (${emailText.overnight})`:''}`:''}` : end ? ` (${emailText.endingAt} ${end})` : '';
+      return {date,start,end,block:date+time,station:$('station').value.trim(),name:$('name').value.trim(),details:$('details').value.trim()};
+    }
+    function fill(template,data){
+      if(!data.start)template=template.replace(/,\s*\{\{\s*start\s*\}\}/g,'');
+      return FlexTemplating.render(template,data);
+    }
+    function contains(template,key){return new RegExp('\\{\\{\\s*'+key+'\\s*\\}\\}').test(template);}
+    function render(){
+      const t=activeTemplate(),data=values();
+      $('subject').value=fill(t.subject,data);
+      let body=fill(t.body,data).trim();
+      if(data.station&&!contains(t.body,'station')) body+=`\n\n${emailText.stationLabel} ${data.station}`;
+      if(data.details&&!contains(t.body,'details')) body+=`\n\n${emailText.detailsLabel}\n${data.details}`;
+      if(!data.start&&!body.includes(emailText.unknownStartTime)) body+=`\n\n${emailText.unknownStartTime}`;
+      if(!contains(t.body,'name')) body+=`\n\n${emailText.signoff}${data.name?'\n'+data.name:''}`;
+      $('body').value=body;
+      edited=false;pending=false;$('pendingNotice').hidden=true;setUiText('draftBadge','Template');setUiText('error','');setUiText('actionStatus','');
+    }
+    function parametersChanged(){
+      setUiText('actionStatus','');
+      if(edited){pending=true;$('pendingNotice').hidden=false;}else render();
+    }
+    function loadEditor(){
+      const t=activeTemplate();$('templateSubject').value=t.subject;$('templateBody').value=t.body;
+      setUiText('typeHint',defaults[$('type').value].hint);setUiText('templateStatus','');
+      if($('type').value==='custom')$('templateEditor').open=true;
+    }
+    $('type').addEventListener('change',()=>{loadEditor();parametersChanged();});
+    for(const id of ['date','start','end','station','name','details'])$(id).addEventListener('input',parametersChanged);
+    for(const id of ['subject','body'])$(id).addEventListener('input',()=>{edited=true;setUiText('draftBadge','Edited by you');setUiText('error','');setUiText('actionStatus','');});
+    $('name').addEventListener('change',savePreferences);
+    for(const {checkbox,email} of recipientRows){
+      $(checkbox).addEventListener('change',()=>{updateRecipientHint();setUiText('error','');setUiText('actionStatus','');});
+      $(email).addEventListener('input',()=>{updateRecipientHint();setUiText('error','');setUiText('actionStatus','');});
+      $(email).addEventListener('change',()=>{$(email).value=$(email).value.trim();updateRecipientHint();savePreferences();});
+    }
+    $('language').addEventListener('change',()=>{language=$('language').value==='en'?'en':'ru';applyLanguage();savePreferences();});
+    $('regenerate').addEventListener('click',render);
+    function replaceTemplate(callback){
+      if(edited&&!window.confirm(t('Replace your manual email edits with the template text?')))return;
+      callback();const stored=savePreferences();loadEditor();render();
+      setUiText('templateStatus',stored?'Template saved in this browser.':'Template applied. Browser storage is unavailable, so it may be lost after closing the page.');
+    }
+    $('saveTemplate').addEventListener('click',()=>{
+      const subject=$('templateSubject').value.trim(),body=$('templateBody').value.trim();
+      if(!subject||!body){setUiText('templateStatus','Enter a template subject and body.');return;}
+      const problem=FlexTemplating.check(subject)||FlexTemplating.check(body);
+      if(problem){setUiText('templateStatus',problem.message,problem.detail);return;}
+      replaceTemplate(()=>{preferences.templates[$('type').value]={subject,body};});
+    });
+    $('resetTemplate').addEventListener('click',()=>{if(!window.confirm(t('Restore the default template for this issue type?')))return;replaceTemplate(()=>{delete preferences.templates[$('type').value];});});
+    function validate(){
+      setUiText('error','');
+      if(!$('blockForm').reportValidity()){
+        setUiText('error','Enter the block date, then select “Create email”.');
+        $('error').scrollIntoView({block:'center'});
+        return false;
+      }
+      if(pending){setUiText('error','The details have changed. Select “Update from template”, then review the email.');$('regenerate').focus();return false;}
+      if(!edited)render();
+      if(!$('subject').value.trim()||!$('body').value.trim()){setUiText('error','Enter an email subject and body.');return false;}
+      if(/\{\{[^{}]+\}\}/.test($('subject').value+'\n'+$('body').value)){setUiText('error','The email still contains template variables. Replace them with actual values.');return false;}
+      return true;
+    }
+    $('createEmail').addEventListener('click',()=>{
+      if(!validate())return;
+      const selectedInputs=selectedRecipientInputs();
+      if(!selectedInputs.length){setUiText('error','Select an email recipient.');$('sendSupport').focus();return;}
+      for(const input of selectedInputs){
+        input.value=input.value.trim();
+        if(!input.reportValidity()){
+          setUiText('error','Enter a valid email address for each selected recipient.');return;
+        }
+      }
+      const selectedRecipients=uniqueAddresses(selectedInputs);
+      updateRecipientHint();
+      savePreferences();
+      const subject=$('subject').value.replace(/[\r\n]+/g,' ');
+      const body=$('body').value.replace(/\r?\n/g,'\r\n');
+      const url='mailto:'+selectedRecipients.map(address=>encodeURIComponent(address).replace(/%40/g,'@')).join(',')+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+      const link=document.createElement('a');link.href=url;document.body.appendChild(link);link.click();link.remove();
+      setUiText('actionStatus','Your mail app was requested to open. If no draft appeared, use Copy text.');
+    });
+    $('copy').addEventListener('click',async()=>{
+      if(!validate())return;
+      const text=$('body').value;
+      try {
+        if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const temp=document.createElement('textarea');temp.value=text;temp.style.cssText='position:fixed;top:0;left:0;opacity:0';temp.setAttribute('readonly','');document.body.appendChild(temp);temp.select();temp.setSelectionRange(0,temp.value.length);
+        let success=false;try {success=document.execCommand('copy');}catch{}temp.remove();
+        if(!success){$('body').focus();$('body').select();setUiText('actionStatus','The text is selected. Copy it using the menu or Ctrl/Cmd+C.');return;}
+      }
+      setUiText('actionStatus','Email body copied.');
+    });
+    $('blockForm').addEventListener('submit',event=>{event.preventDefault();$('createEmail').click();});
+    applyLanguage();updateRecipientHint();loadEditor();render();
+  })();
+  </script>
+</body>
+</html>
