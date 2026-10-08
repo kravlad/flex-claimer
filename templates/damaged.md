@@ -1,5 +1,6 @@
 ---
 label: Damaged package — returned to the station
+group: Undelivered packages
 hint: For a damaged package returned to the station. Include the return date and attach the photo you took in your mail app.
 subject: Remove undelivered-package entry — damaged package returned — {{date}}, {{start}}
 ---

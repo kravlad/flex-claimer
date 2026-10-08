@@ -4,11 +4,16 @@
   const STORAGE_KEY = 'flex-claimer.preferences.v1';
   const {config,translations,templates} = window.FLEX_CLAIMER_DATA;
   const russian = translations.ru;
-  for (const key of Object.keys(templates)) {
-    const option = document.createElement('option');
-    option.value = key;option.textContent = templates[key].label;option.setAttribute('data-i18n','');
-    $('type').append(option);
+  // Issue type menu: groups sorted by name, each with its templates in file-name order, then the templates
+  // without a group. Built before the translatable text is collected below, so its labels get translated.
+  const groups = new Map(), ungrouped = [];
+  for (const [key,{label,group}] of Object.entries(templates)) {
+    if (!group) ungrouped.push({key,label});
+    else { if (!groups.has(group)) groups.set(group,[]); groups.get(group).push({key,label}); }
   }
+  const typeTree = [...[...groups].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([label,items])=>({label,items})),...ungrouped];
+  const typeMenu = FlexTypeMenu.create({container:$('typeMenu'),input:$('type'),labelId:'typeLabel',tree:typeTree});
+  $('type').value = typeMenu.firstKey;typeMenu.sync();
   let language = 'en';
   const staticText = [...document.querySelectorAll('[data-i18n]')].map(el=>({el,source:el.textContent}));
   const translatedAttributes = [
@@ -114,7 +119,7 @@
   }
   function loadEditor(){
     const t=activeTemplate();$('templateSubject').value=t.subject;$('templateBody').value=t.body;
-    setUiText('typeHint',defaults[$('type').value].hint);setUiText('templateStatus','');
+    setUiText('typeButtonText',defaults[$('type').value].label);setUiText('typeHint',defaults[$('type').value].hint);setUiText('templateStatus','');
     if($('type').value==='custom')$('templateEditor').open=true;
   }
   $('type').addEventListener('change',()=>{loadEditor();parametersChanged();});

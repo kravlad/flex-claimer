@@ -1,5 +1,6 @@
 ---
 label: Undelivered packages — no access, customer did not answer
+group: Undelivered packages
 hint: For packages undelivered because there was no access and the customer did not answer your call. Describe the delivery attempt.
 subject: Remove undelivered-package entries — no access — {{date}}, {{start}}
 ---

@@ -91,5 +91,9 @@
   "Enter the block date, then select “Create email”.": "Укажи дату блока, затем нажми «Создать email».",
   "Your mail app was requested to open. If no draft appeared, use Copy text.": "Запрошено открытие почты. Если черновик не появился, воспользуйся копированием.",
   "The text is selected. Copy it using the menu or Ctrl/Cmd+C.": "Текст выделен. Скопируй его через меню или Ctrl/Cmd+C.",
-  "Email body copied.": "Текст письма скопирован."
+  "Email body copied.": "Текст письма скопирован.",
+  "Check-in & standing": "Регистрация и standing",
+  "Undelivered packages": "Недоставленные посылки",
+  "Late deliveries": "Опоздания",
+  "Pay & time": "Оплата и время"
 }

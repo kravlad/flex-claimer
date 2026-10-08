@@ -17,16 +17,18 @@
 //
 // translations/ru.json — Russian UI translations. English is the default language; keys are the English UI strings.
 //
-// templates/<key>.md — one file per issue type, picked up automatically. The key is the file name without
-// .md, and the "Issue type" list shows the types sorted by file name. Front matter with one `key: value` per
-// line, then the email body:
+// templates/**/<key>.md — one file per issue type, picked up automatically, also from nested folders (folders
+// only organize files; they do not affect the menu). The key is the file name without .md and must be unique.
+// The "Issue type" menu shows the groups sorted by name, each with its templates sorted by file name, then the
+// templates without a group. Front matter with one `key: value` per line, then the email body:
 //   ---
-//   label: Issue type name shown in the list
-//   hint: Help text shown under the list
+//   label: Issue type name shown in the menu
+//   group: Menu group (optional; without it the template is at the top level of the menu)
+//   hint: Help text shown under the menu
 //   subject: Email subject template
 //   ---
 //   Email body template…
-// Front matter values are taken as is (no YAML quoting). label and hint are UI text: add their
+// Front matter values are taken as is (no YAML quoting). label, group and hint are UI text: add their
 // translations to translations/ru.json. Template syntax is described in src/templating.js.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -38,6 +40,7 @@ const templatesDir = path.join(root, 'templates');
 const sourceFile = path.join(root, 'src', 'index.html');
 const outputFile = path.join(root, 'dist', 'index.html');
 const fields = ['label', 'hint', 'subject'];
+const optionalFields = ['group'];
 const emailTextKeys = ['missingDate', 'overnight', 'endingAt', 'stationLabel', 'detailsLabel', 'unknownStartTime', 'signoff'];
 
 // Load the same scripts the page uses, so templates are checked by the page's own rules.
@@ -90,10 +93,11 @@ function parseTemplate(file, ru) {
     if (!line.trim()) continue;
     const field = line.match(/^(\w+):(.*)$/);
     if (!field) errors.push(`${file}: front matter line is not "key: value": ${line}`);
-    else if (!fields.includes(field[1])) errors.push(`${file}: unknown front matter key "${field[1]}" (expected ${fields.join(', ')})`);
+    else if (![...fields, ...optionalFields].includes(field[1])) errors.push(`${file}: unknown front matter key "${field[1]}" (expected ${[...fields, ...optionalFields].join(', ')})`);
     else template[field[1]] = field[2].trim();
   }
   for (const key of fields) if (!template[key]) errors.push(`${file}: "${key}" is missing or empty`);
+  for (const key of optionalFields) if (key in template && !template[key]) errors.push(`${file}: "${key}" is empty (remove the line to leave the template without it)`);
   template.body = match[2].trim();
   if (!template.body) errors.push(`${file}: the email body is empty`);
   for (const key of ['subject', 'body']) {
@@ -111,15 +115,28 @@ const ru = readJson('translations/ru.json');
 if (config) checkConfig(config);
 if (ru) checkTranslations(ru);
 
-// Every templates/*.md, in file-name order; the page lists issue types in the order of this object's keys.
+// Every templates/**/*.md (paths relative to templates/), keyed by file name and ordered by it; the page
+// builds the menu from this order.
 const templates = {};
-const templateFiles = fs.readdirSync(templatesDir).filter(file => file.endsWith('.md')).sort();
+const templateFiles = fs.readdirSync(templatesDir, {recursive: true})
+  .filter(file => file.endsWith('.md') && fs.statSync(path.join(templatesDir, file)).isFile())
+  .sort((a, b) => path.basename(a) < path.basename(b) ? -1 : path.basename(a) > path.basename(b) ? 1 : 0);
 if (!templateFiles.length) errors.push('templates/: no .md files');
+const keyFiles = {};
 for (const file of templateFiles) {
+  const name = path.basename(file);
+  const key = name.slice(0, -3);
   // A key must start with a letter: JavaScript puts integer-like keys ("123") first, which would break the order.
-  if (!/^[A-Za-z][A-Za-z0-9_-]*\.md$/.test(file)) errors.push(`${file}: the file name must start with a letter and use only letters, digits, "-" and "_"`);
-  templates[file.slice(0, -3)] = parseTemplate(file, ru);
+  if (!/^[A-Za-z][A-Za-z0-9_-]*\.md$/.test(name)) errors.push(`${file}: the file name must start with a letter and use only letters, digits, "-" and "_"`);
+  if (key in keyFiles) {
+    errors.push(`${file}: the same file name as ${keyFiles[key]}; template file names must be unique across folders`);
+    continue;
+  }
+  keyFiles[key] = file;
+  templates[key] = parseTemplate(file, ru);
 }
+const untranslatedGroups = new Set(Object.values(templates).map(template => template?.group).filter(group => group && ru && !(group in ru)));
+for (const group of untranslatedGroups) warnings.push(`group "${group}" has no Russian translation in translations/ru.json`);
 
 // Replaces each <script src="…"></script> in src/index.html with an inline script. "data.js" is the
 // generated data; other paths are files relative to src/. `<` in the data is written as <, so no

@@ -1,5 +1,6 @@
 ---
 label: Incorrect standing issue
+group: Check-in & standing
 hint: Explain which standing entry is incorrect and why. Attach any evidence in your mail app.
 subject: Request to review standing — {{date}}, {{start}}
 ---

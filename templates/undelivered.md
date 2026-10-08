@@ -1,5 +1,6 @@
 ---
 label: Undelivered packages — route exceeded the block
+group: Undelivered packages
 hint: Include the package count, route distance, and when you ended the block in the app. Use this template when the workload could not be completed within the block time.
 subject: Remove undelivered-package standing entries — {{date}}, {{start}}
 ---

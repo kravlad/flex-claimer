@@ -1,5 +1,6 @@
 ---
 label: Late delivery — no more than 5 minutes
+group: Late deliveries
 hint: For a review of late marks where the delay was no more than 5 minutes. Include the actual delay and its reasons.
 subject: Review and remove minor late-delivery entries — {{date}}, {{start}}
 ---

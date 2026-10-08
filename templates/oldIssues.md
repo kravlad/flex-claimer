@@ -1,5 +1,6 @@
 ---
 label: Undelivered packages — entries older than 2 months
+group: Undelivered packages
 hint: For undelivered-package entries that have remained in your standing for more than two months. Include the issue date and any previous support requests.
 subject: Remove undelivered-package entries older than two months — {{date}}, {{start}}
 ---

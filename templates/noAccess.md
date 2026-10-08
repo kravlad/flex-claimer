@@ -1,5 +1,6 @@
 ---
 label: Undelivered packages — no access after 8 PM
+group: Undelivered packages
 hint: For packages undelivered because there was no access after 8 PM and customer calls were not permitted. Describe the delivery attempt.
 subject: Remove undelivered-package entries — no access — {{date}}, {{start}}
 ---

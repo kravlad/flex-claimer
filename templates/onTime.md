@@ -1,5 +1,6 @@
 ---
 label: Delivered on time — incorrect late marks
+group: Late deliveries
 hint: For incorrect late marks when every package was delivered on time. Include the deadlines and delivery times; attach supporting evidence in your mail app.
 subject: Remove incorrect late-delivery standing entries — {{date}}, {{start}}
 ---

@@ -14,10 +14,10 @@
     <div class="topbar"><div class="brand"><span class="mark" aria-hidden="true">↗</span>Flex Claimer<span data-i18n>A support email · in a few minutes</span></div><div class="language-picker"><label for="language" data-i18n>Language</label><select id="language" aria-label="Language / Язык"><option value="ru">RU</option><option value="en" selected>EN</option></select></div></div>
     <header><p class="eyebrow" data-i18n>Amazon Flex · driver assistant</p><h1 data-i18n>Tell us what happened.</h1><p data-i18n>Choose an issue and enter your block details. Get an email draft to review and open in your mail app.</p></header>
     <main>
-      <section class="card" aria-labelledby="blockHeading">
+      <section class="card card-menu-host" aria-labelledby="blockHeading">
         <div class="card-head"><span class="step">01</span><h2 id="blockHeading" data-i18n>Issue and block</h2></div>
         <form id="blockForm" class="fields">
-          <div class="field"><label for="type" data-i18n>Issue type</label><select id="type"></select><p class="type-hint" id="typeHint"></p></div>
+          <div class="field"><span class="field-label" id="typeLabel" data-i18n>Issue type</span><input type="hidden" id="type"><div class="type-menu" id="typeMenu"></div><p class="type-hint" id="typeHint"></p></div>
           <div class="field"><label for="date" data-i18n>Block date</label><div class="native-input"><input type="date" id="date" required></div><p class="hint" data-i18n>Use the station’s local date and time.</p></div>
           <div class="row"><div class="field"><label for="start"><span data-i18n>Block start time</span> <span class="optional" data-i18n>· optional</span></label><div class="native-input"><input type="time" id="start"></div></div><div class="field"><label for="end"><span data-i18n>End time</span> <span class="optional" data-i18n>· optional</span></label><div class="native-input"><input type="time" id="end"></div></div></div>
           <div class="field"><label for="station"><span data-i18n>Station</span> <span class="optional" data-i18n>· optional</span></label><input id="station" maxlength="120" placeholder="For example, DAX5" data-i18n-placeholder autocomplete="off"></div>
@@ -45,6 +45,7 @@
   <script src="../vendor/handlebars.min.js"></script>
   <script src="templating.js"></script>
   <script src="data.js"></script>
+  <script src="type-menu.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
