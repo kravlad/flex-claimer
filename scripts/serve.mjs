@@ -1,11 +1,11 @@
-// Serves the project folder over HTTP on 127.0.0.1 (run with `mise run serve`, which builds first).
+// Serves dist/ (the built page) over HTTP on 127.0.0.1 (run with `mise run serve`, which builds first).
 // Port: PORT environment variable, default 8000.
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-const root = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const port = Number(process.env.PORT) || 8000;
 const types = {
   '.html': 'text/html; charset=utf-8',

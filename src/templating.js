@@ -1,4 +1,4 @@
-// Email template checking and rendering with Handlebars, shared by index.html and build.mjs.
+// Email template checking and rendering with Handlebars, shared by src/index.html and scripts/build.mjs.
 // Templates may use the variables below and {{#if var}}…{{else}}…{{/if}} / {{#unless var}}…{{/unless}}.
 (root => {
   'use strict';
