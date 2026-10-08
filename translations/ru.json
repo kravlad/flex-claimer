@@ -20,6 +20,8 @@
   "Missing block payment": "Блок не оплачен",
   "Route exceeded the block time": "Маршрут занял больше времени",
   "Custom template": "Собственный шаблон",
+  "Seven-day account pause — canceled blocks": "Пауза аккаунта на 7 дней — отменённые блоки",
+  "Request a review of a seven-day account pause for a high volume of canceled blocks. Check that the cancellations were within the permitted window.": "Пересмотр паузы аккаунта на 7 дней за большое количество отменённых блоков. Проверь, что отмены были в разрешённый срок.",
   "Block date": "Дата блока",
   "Use the station’s local date and time.": "Дата и время по местному времени станции.",
   "Block start time": "Начало блока",
