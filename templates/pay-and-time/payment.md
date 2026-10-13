@@ -6,7 +6,7 @@ subject: Missing block payment — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 
-I am writing about missing payment for my block on {{block}}.
+I am writing about missing payment for my block on {{start}}.
 
 I completed this block, but the corresponding payment is not reflected in my earnings.
 

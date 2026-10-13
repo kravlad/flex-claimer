@@ -6,7 +6,7 @@ subject: Review and remove minor late-delivery entries — {{req:date}}, {{start
 ---
 Hello Amazon Flex Support,
 
-I am requesting a review of late-delivery entries affecting my standing for my block on {{block}}.
+I am requesting a review of late-delivery entries affecting my standing for my block on {{start}}.
 
 The deliveries recorded as late had only a minor delay of no more than five minutes. I request that you consider the very short duration of the delay and remove these late-delivery entries from my delivery history.
 

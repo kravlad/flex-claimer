@@ -6,7 +6,7 @@ subject: Remove incorrect late-delivery standing entries — {{req:date}}, {{sta
 ---
 Hello Amazon Flex Support,
 
-I am disputing late-delivery entries in my standing for my block on {{block}}.
+I am disputing late-delivery entries in my standing for my block on {{start}}.
 
 All packages were delivered on time, within their applicable delivery deadlines. The entries marking these deliveries as late are incorrect.
 

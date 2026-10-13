@@ -6,7 +6,7 @@ subject: Request to review standing — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 
-I am requesting a review of a standing issue associated with my block on {{block}}.
+I am requesting a review of a standing issue associated with my block on {{start}}.
 
 I believe the issue attributed to this block is incorrect. Please review the relevant delivery records, app activity, and any available support records together with the information provided in this email.
 

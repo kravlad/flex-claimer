@@ -6,7 +6,7 @@ subject: Unable to check in — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 
-I am writing about my scheduled block on {{block}}.
+I am writing about my scheduled block on {{start}}.
 
 I arrived within the permitted check-in window, but the app displayed “Late Scan” and prevented me from completing check-in and starting the block.
 

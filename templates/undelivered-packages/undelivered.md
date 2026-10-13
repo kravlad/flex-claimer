@@ -6,7 +6,7 @@ subject: Remove undelivered-package standing entries — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 
-I am requesting the removal of undelivered-package entries from my standing for my block on {{block}}.
+I am requesting the removal of undelivered-package entries from my standing for my block on {{start}}.
 
 The assigned route contained too many packages and required too much travel for the scheduled block duration. I was unable to deliver all of the assigned packages within that time. After the scheduled block time ended, I ended the block in the app.
 

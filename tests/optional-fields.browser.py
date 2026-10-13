@@ -78,8 +78,10 @@ class OptionalFieldsTests(unittest.TestCase):
         for key in self.page.evaluate('Object.keys(FLEX_CLAIMER_DATA.templates)'):
             with self.subTest(template=key):
                 self.choose(key)
-                self.fields_are(['name'] if key == 'accountPause' else ['date', 'start', 'end'],
-                                [] if key == 'accountPause' else ['date'])
+                visible = ['name'] if key == 'accountPause' else ['date', 'start']
+                if key == 'overtime':
+                    visible.append('end')
+                self.fields_are(visible, [] if key == 'accountPause' else ['date'])
 
     def test_apply_reload_and_reset_update_fields(self):
         self.apply_template('Station {{station}}', '{{#if details}}More information provided.{{/if}}')
@@ -90,7 +92,7 @@ class OptionalFieldsTests(unittest.TestCase):
         self.apply_template('General request', 'Hello support.')
         self.fields_are([])
         self.page.locator('#resetTemplate').click()
-        self.fields_are(['date', 'start', 'end'], ['date'])
+        self.fields_are(['date', 'start'], ['date'])
 
     def test_hidden_values_are_preserved_but_excluded_from_the_email(self):
         self.apply_template('{{name}} {{station}}', '{{block}}\n{{details}}')
@@ -119,7 +121,7 @@ class OptionalFieldsTests(unittest.TestCase):
         self.page.locator('#name').fill('Saved Driver')
         self.page.locator('#body').fill('My manual draft')
         self.choose('custom')
-        self.fields_are(['date', 'start', 'end'], ['date'])
+        self.fields_are(['date', 'start'], ['date'])
         self.assertEqual(self.page.locator('#body').input_value(), 'My manual draft')
         self.assertTrue(self.page.locator('#pendingNotice').is_visible())
         self.page.locator('#regenerate').click()
@@ -225,7 +227,7 @@ class OptionalFieldsTests(unittest.TestCase):
         self.page.locator('#language').select_option('ru')
         self.fields_are(['date', 'station'], ['station'])
         self.page.locator('#resetTemplate').click()
-        self.fields_are(['date', 'start', 'end'], ['date'])
+        self.fields_are(['date', 'start'], ['date'])
 
     def test_required_interpolation_does_not_duplicate_appended_fields(self):
         self.apply_template('Request', '{{req:station}}\n{{req:name}}\n{{req:details}}')

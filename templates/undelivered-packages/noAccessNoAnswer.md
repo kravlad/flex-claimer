@@ -6,7 +6,7 @@ subject: Remove undelivered-package entries — no access — {{req:date}}, {{st
 ---
 Hello Amazon Flex Support,
 
-I am requesting the removal of undelivered-package entries from my standing for my block on {{block}}.
+I am requesting the removal of undelivered-package entries from my standing for my block on {{start}}.
 
 I could not complete these deliveries for a valid reason: there was no access to the building or delivery location. I tried to call the customer to obtain access, but they did not answer. There was also no safe place to leave the packages.
 

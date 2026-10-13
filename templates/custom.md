@@ -5,7 +5,7 @@ subject: Block review request — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 
-I am writing about my block on {{block}}.
+I am writing about my block on {{start}}.
 
 Please review the issue described below and let me know the outcome.
 

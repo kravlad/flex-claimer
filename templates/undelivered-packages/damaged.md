@@ -6,7 +6,7 @@ subject: Remove undelivered-package entry — damaged package returned — {{req
 ---
 Hello Amazon Flex Support,
 
-I am disputing an undelivered-package entry affecting my standing for my block on {{block}}.
+I am disputing an undelivered-package entry affecting my standing for my block on {{start}}.
 
 The package was damaged, so I did not deliver it to the customer. I returned it to the station and took a photo documenting the damage.
 

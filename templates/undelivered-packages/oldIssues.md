@@ -6,7 +6,7 @@ subject: Remove undelivered-package entries older than two months — {{req:date
 ---
 Hello Amazon Flex Support,
 
-I am requesting a review and removal of undelivered-package entries associated with my block on {{block}}.
+I am requesting a review and removal of undelivered-package entries associated with my block on {{start}}.
 
 These entries have remained in my standing for more than two months and are still affecting it. I should not have to carry the impact of these historical entries indefinitely.
 
