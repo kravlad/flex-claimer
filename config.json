@@ -10,7 +10,6 @@
     }
   },
   "emailText": {
-    "missingDate": "[block date]",
     "overnight": "ending the following day",
     "endingAt": "ending at",
     "stationLabel": "Station:",

@@ -2,7 +2,7 @@
 label: Missing block payment
 group: Pay & time
 hint: For a completed block with missing payment. Include the agreed amount in the details if needed.
-subject: Missing block payment — {{date}}, {{start}}
+subject: Missing block payment — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 

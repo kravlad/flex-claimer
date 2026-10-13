@@ -7,7 +7,6 @@
 // config.json
 //   recipients.support / recipients.jeff — fixed recipient: `address`, and `checked` (selected when the page opens).
 //   emailText — text the page adds around the template:
-//     missingDate       substituted for {{date}} / {{block}} when no date is entered
 //     overnight         appended to {{block}} as " (…)" when the end time is earlier than the start time
 //     endingAt          appended to {{block}} as " (… <end time>)" when only the end time is entered
 //     stationLabel      appended as "<stationLabel> <station>" when the template has no {{station}}
@@ -40,7 +39,7 @@ const sourceFile = path.join(root, 'src', 'index.html');
 const outputFile = path.join(root, 'dist', 'index.html');
 const fields = ['label', 'hint', 'subject'];
 const optionalFields = ['group'];
-const emailTextKeys = ['missingDate', 'overnight', 'endingAt', 'stationLabel', 'detailsLabel', 'signoff'];
+const emailTextKeys = ['overnight', 'endingAt', 'stationLabel', 'detailsLabel', 'signoff'];
 
 // Load the same scripts the page uses, so templates are checked by the page's own rules.
 const context = vm.createContext({});

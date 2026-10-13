@@ -1,9 +1,11 @@
 // Email template checking and rendering with Handlebars, shared by src/index.html and scripts/build.mjs.
 // Templates may use the variables below and {{#if var}}…{{else}}…{{/if}} / {{#unless var}}…{{/unless}}.
+// Prefix a variable with req: to require its field. req:block requires date, start and end.
 (root => {
   'use strict';
   const variables = ['date', 'start', 'end', 'block', 'station', 'name', 'details'];
   const blockHelpers = ['if', 'unless'];
+  const baseVariable = name => name.startsWith('req:') ? name.slice(4) : name;
 
   // Returns null for a valid template, or {message, detail} for the first problem found.
   // `message` is a UI string (translated by the page), `detail` is the offending template text.
@@ -26,11 +28,11 @@
       const node = pending.shift();
       if (node.type === 'ContentStatement' || node.type === 'CommentStatement') continue;
       if (node.type === 'MustacheStatement' && node.path.type === 'PathExpression' && !node.params.length && !node.hash) {
-        if (!variables.includes(node.path.original)) return {message: 'Unknown variable: ', detail: opening(node)};
+        if (!variables.includes(baseVariable(node.path.original))) return {message: 'Unknown variable: ', detail: opening(node)};
         continue;
       }
       if (node.type === 'BlockStatement' && blockHelpers.includes(node.path.original) && node.params.length === 1 && !node.hash && node.params[0].type === 'PathExpression') {
-        if (!variables.includes(node.params[0].original)) return {message: 'Unknown variable: ', detail: opening(node)};
+        if (!variables.includes(baseVariable(node.params[0].original))) return {message: 'Unknown variable: ', detail: opening(node)};
         pending.push(...node.program.body, ...(node.inverse ? node.inverse.body : []));
         continue;
       }
@@ -41,25 +43,36 @@
 
   // Plain-text output: Handlebars' HTML escaping is turned off.
   function render(source, data) {
-    return root.Handlebars.compile(source, {noEscape: true})(data);
+    const values = {...data};
+    for (const key of variables) values[`req:${key}`] = data[key];
+    return root.Handlebars.compile(source, {noEscape: true})(values);
   }
 
   // Inspect the active, validated template rather than rendered text: conditions
   // refer to fields even when their branch is empty, but comments do not.
-  function optionalFields(...sources) {
+  function fields(...sources) {
     const used = new Set();
+    const required = new Set();
+    const add = name => {
+      const key = baseVariable(name);
+      const keys = key === 'block' ? ['date', 'start', 'end'] : [key];
+      for (const field of keys) {
+        used.add(field);
+        if (name.startsWith('req:')) required.add(field);
+      }
+    };
     const pending = sources.flatMap(source => root.Handlebars.parse(source).body);
     while (pending.length) {
       const node = pending.pop();
-      if (node.type === 'MustacheStatement') used.add(node.path.original);
+      if (node.type === 'MustacheStatement') add(node.path.original);
       if (node.type === 'BlockStatement') {
-        for (const param of node.params) used.add(param.original);
+        for (const param of node.params) add(param.original);
         pending.push(...node.program.body, ...(node.inverse ? node.inverse.body : []));
       }
     }
-    return ['start', 'end', 'station', 'name', 'details'].filter(key =>
-      used.has(key) || (used.has('block') && (key === 'start' || key === 'end')));
+    const keys = variables.filter(key => key !== 'block');
+    return {visible: keys.filter(key => used.has(key)), required: keys.filter(key => required.has(key))};
   }
 
-  root.FlexTemplating = {variables, check, render, optionalFields};
+  root.FlexTemplating = {variables, check, render, fields};
 })(window);

@@ -2,7 +2,7 @@
 label: Late Scan — unable to start a block
 group: Check-in & standing
 hint: For cases where you arrived within the permitted check-in window but the app showed Late Scan. Check this statement in the email.
-subject: Unable to check in — {{date}}, {{start}}
+subject: Unable to check in — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 

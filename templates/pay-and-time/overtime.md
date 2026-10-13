@@ -2,7 +2,7 @@
 label: Route exceeded the block time
 group: Pay & time
 hint: Include your actual finish time, package count, and reasons for the delay in the details.
-subject: Review of additional delivery time — {{date}}, {{start}}
+subject: Review of additional delivery time — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 

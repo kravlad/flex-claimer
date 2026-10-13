@@ -1,7 +1,7 @@
 ---
 label: Custom template
 hint: Open “Edit template” and enter your text. Variables in double braces will be replaced with your block details.
-subject: Block review request — {{date}}, {{start}}
+subject: Block review request — {{req:date}}, {{start}}
 ---
 Hello Amazon Flex Support,
 

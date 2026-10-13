@@ -81,21 +81,26 @@
     try {localStorage.setItem(STORAGE_KEY,JSON.stringify(preferences));return true;} catch {return false;}
   }
   function activeTemplate(){return preferences.templates[$('type').value] || defaults[$('type').value];}
-  const optionalIds = ['start', 'end', 'station', 'name', 'details'];
+  const fieldIds = ['date', 'start', 'end', 'station', 'name', 'details'];
   let activeFields = new Set();
-  function updateOptionalFields(template){
-    activeFields = new Set(FlexTemplating.optionalFields(template.subject,template.body));
-    for(const id of optionalIds){
+  function updateFields(template){
+    const rules=FlexTemplating.fields(template.subject,template.body);
+    activeFields = new Set(rules.visible);
+    const requiredFields=new Set(rules.required);
+    for(const id of fieldIds){
       const visible=activeFields.has(id);
       $(id).closest('.field').hidden=!visible;
       $(id).disabled=!visible;
+      $(id).required=visible&&requiredFields.has(id);
+      $(id).setCustomValidity('');
+      setUiText(`${id}Requirement`,$(id).required?'· required':'· optional');
     }
     const timeRow=$('start').closest('.row');
     timeRow.hidden=!activeFields.has('start')&&!activeFields.has('end');
     timeRow.classList.toggle('single-field',activeFields.has('start')!==activeFields.has('end'));
   }
   function formatDate(value){
-    if (!value) return emailText.missingDate;
+    if (!value) return '';
     const [y,m,d] = value.split('-').map(Number);
     return new Intl.DateTimeFormat('en-US',{year:'numeric',month:'long',day:'numeric'}).format(new Date(y,m-1,d,12));
   }
@@ -107,16 +112,17 @@
   function values(){
     const value=id=>activeFields.has(id)?$(id).value:'';
     const startValue=value('start'),endValue=value('end');
-    const date=formatDate($('date').value),start=formatTime(startValue),end=formatTime(endValue);
+    const date=formatDate(value('date')),start=formatTime(startValue),end=formatTime(endValue);
     const overnight=endValue && startValue && endValue < startValue;
-    const time=start ? `, ${start}${end ? `–${end}${overnight?` (${emailText.overnight})`:''}`:''}` : end ? ` (${emailText.endingAt} ${end})` : '';
-    return {date,start,end,block:date+time,station:value('station').trim(),name:value('name').trim(),details:value('details').trim()};
+    const time=start ? `${start}${end ? `–${end}${overnight?` (${emailText.overnight})`:''}`:''}` : end ? `(${emailText.endingAt} ${end})` : '';
+    const block=[date,time].filter(Boolean).join(start?', ':' ');
+    return {date,start,end,block,station:value('station').trim(),name:value('name').trim(),details:value('details').trim()};
   }
   function fill(template,data){
-    if(!data.start)template=template.replace(/,\s*\{\{\s*start\s*\}\}/g,'');
+    if(!data.start)template=template.replace(/,\s*\{\{\s*(?:req:)?start\s*\}\}/g,'');
     return FlexTemplating.render(template,data);
   }
-  function contains(template,key){return new RegExp('\\{\\{\\s*'+key+'\\s*\\}\\}').test(template);}
+  function contains(template,key){return new RegExp('\\{\\{\\s*(?:req:)?'+key+'\\s*\\}\\}').test(template);}
   function render(){
     const t=activeTemplate(),data=values();
     $('subject').value=fill(t.subject,data);
@@ -133,12 +139,12 @@
   }
   function loadEditor(){
     const t=activeTemplate();$('templateSubject').value=t.subject;$('templateBody').value=t.body;
-    updateOptionalFields(t);
+    updateFields(t);
     setUiText('typeButtonText',defaults[$('type').value].label);setUiText('typeHint',defaults[$('type').value].hint);setUiText('templateStatus','');
     if($('type').value==='custom')$('templateEditor').open=true;
   }
   $('type').addEventListener('change',()=>{loadEditor();parametersChanged();});
-  for(const id of ['date','start','end','station','name','details'])$(id).addEventListener('input',parametersChanged);
+  for(const id of fieldIds)$(id).addEventListener('input',()=>{$(id).setCustomValidity('');parametersChanged();});
   for(const id of ['subject','body'])$(id).addEventListener('input',()=>{edited=true;setUiText('draftBadge','Edited by you');setUiText('error','');setUiText('actionStatus','');});
   $('name').addEventListener('change',savePreferences);
   for(const {checkbox,email} of recipientRows){
@@ -163,8 +169,12 @@
   $('resetTemplate').addEventListener('click',()=>{if(!window.confirm(t('Restore the default template for this issue type?')))return;replaceTemplate(()=>{delete preferences.templates[$('type').value];});});
   function validate(){
     setUiText('error','');
+    for(const id of fieldIds){
+      const input=$(id);
+      input.setCustomValidity(input.required&&!input.value.trim()?t('Fill in this required field.'):'');
+    }
     if(!$('blockForm').reportValidity()){
-      setUiText('error','Enter the block date, then select “Create email”.');
+      setUiText('error','Check the highlighted fields, then select “Create email”.');
       $('error').scrollIntoView({block:'center'});
       return false;
     }
