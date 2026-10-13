@@ -44,5 +44,22 @@
     return root.Handlebars.compile(source, {noEscape: true})(data);
   }
 
-  root.FlexTemplating = {variables, check, render};
+  // Inspect the active, validated template rather than rendered text: conditions
+  // refer to fields even when their branch is empty, but comments do not.
+  function optionalFields(...sources) {
+    const used = new Set();
+    const pending = sources.flatMap(source => root.Handlebars.parse(source).body);
+    while (pending.length) {
+      const node = pending.pop();
+      if (node.type === 'MustacheStatement') used.add(node.path.original);
+      if (node.type === 'BlockStatement') {
+        for (const param of node.params) used.add(param.original);
+        pending.push(...node.program.body, ...(node.inverse ? node.inverse.body : []));
+      }
+    }
+    return ['start', 'end', 'station', 'name', 'details'].filter(key =>
+      used.has(key) || (used.has('block') && (key === 'start' || key === 'end')));
+  }
+
+  root.FlexTemplating = {variables, check, render, optionalFields};
 })(window);

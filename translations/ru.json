@@ -39,7 +39,7 @@
   "Template variables": "Переменные шаблона",
   "Subject template": "Шаблон темы",
   "Email template": "Шаблон письма",
-  "{{block}} includes the date and time. An end time earlier than the start means the block ends the next day. Station details, additional information, and your signature are appended automatically if their variables are not in the template.": "{{block}} — дата и время целиком. Если конец раньше начала, блок заканчивается на следующий день. Данные станции, уточнения и подпись добавятся автоматически, если их переменных нет в шаблоне.",
+  "Optional fields appear when their variables are used in the subject or body template, including conditions. {{block}} includes the date and both times. An end time earlier than the start means the block ends the next day.": "Необязательные поля появляются, если их переменные используются в теме или тексте шаблона, в том числе в условиях. {{block}} включает дату, время начала и окончания. Если конец раньше начала, блок заканчивается на следующий день.",
   "Apply and save": "Применить и сохранить",
   "Restore default": "Вернуть исходный",
   "Your email": "Твоё письмо",

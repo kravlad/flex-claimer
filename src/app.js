@@ -81,6 +81,19 @@
     try {localStorage.setItem(STORAGE_KEY,JSON.stringify(preferences));return true;} catch {return false;}
   }
   function activeTemplate(){return preferences.templates[$('type').value] || defaults[$('type').value];}
+  const optionalIds = ['start', 'end', 'station', 'name', 'details'];
+  let activeFields = new Set();
+  function updateOptionalFields(template){
+    activeFields = new Set(FlexTemplating.optionalFields(template.subject,template.body));
+    for(const id of optionalIds){
+      const visible=activeFields.has(id);
+      $(id).closest('.field').hidden=!visible;
+      $(id).disabled=!visible;
+    }
+    const timeRow=$('start').closest('.row');
+    timeRow.hidden=!activeFields.has('start')&&!activeFields.has('end');
+    timeRow.classList.toggle('single-field',activeFields.has('start')!==activeFields.has('end'));
+  }
   function formatDate(value){
     if (!value) return emailText.missingDate;
     const [y,m,d] = value.split('-').map(Number);
@@ -92,10 +105,12 @@
     return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'AM' : 'PM'}`;
   }
   function values(){
-    const date=formatDate($('date').value),start=formatTime($('start').value),end=$('end').value ? formatTime($('end').value):'';
-    const overnight=$('end').value && $('start').value && $('end').value < $('start').value;
+    const value=id=>activeFields.has(id)?$(id).value:'';
+    const startValue=value('start'),endValue=value('end');
+    const date=formatDate($('date').value),start=formatTime(startValue),end=formatTime(endValue);
+    const overnight=endValue && startValue && endValue < startValue;
     const time=start ? `, ${start}${end ? `–${end}${overnight?` (${emailText.overnight})`:''}`:''}` : end ? ` (${emailText.endingAt} ${end})` : '';
-    return {date,start,end,block:date+time,station:$('station').value.trim(),name:$('name').value.trim(),details:$('details').value.trim()};
+    return {date,start,end,block:date+time,station:value('station').trim(),name:value('name').trim(),details:value('details').trim()};
   }
   function fill(template,data){
     if(!data.start)template=template.replace(/,\s*\{\{\s*start\s*\}\}/g,'');
@@ -118,6 +133,7 @@
   }
   function loadEditor(){
     const t=activeTemplate();$('templateSubject').value=t.subject;$('templateBody').value=t.body;
+    updateOptionalFields(t);
     setUiText('typeButtonText',defaults[$('type').value].label);setUiText('typeHint',defaults[$('type').value].hint);setUiText('templateStatus','');
     if($('type').value==='custom')$('templateEditor').open=true;
   }
