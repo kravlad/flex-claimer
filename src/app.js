@@ -108,7 +108,6 @@
     let body=fill(t.body,data).trim();
     if(data.station&&!contains(t.body,'station')) body+=`\n\n${emailText.stationLabel} ${data.station}`;
     if(data.details&&!contains(t.body,'details')) body+=`\n\n${emailText.detailsLabel}\n${data.details}`;
-    if(!data.start&&!body.includes(emailText.unknownStartTime)) body+=`\n\n${emailText.unknownStartTime}`;
     if(!contains(t.body,'name')) body+=`\n\n${emailText.signoff}${data.name?'\n'+data.name:''}`;
     $('body').value=body;
     edited=false;pending=false;$('pendingNotice').hidden=true;setUiText('draftBadge','Template');setUiText('error','');setUiText('actionStatus','');

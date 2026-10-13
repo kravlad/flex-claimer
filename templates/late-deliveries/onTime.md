@@ -15,3 +15,7 @@ Please compare the recorded delivery timestamps with the delivery deadlines show
 If you believe any delivery was late, please identify the relevant delivery deadline and recorded delivery time so that I can understand and respond to the discrepancy.
 
 Please confirm the outcome of your review and the correction to my standing.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}

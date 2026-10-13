@@ -13,3 +13,7 @@ The package was damaged, so I did not deliver it to the customer. I returned it 
 Please review the package return records and the photographic evidence. This was a damaged package returned to the station, not an unjustified failure to deliver.
 
 Remove the undelivered-package entry from my delivery history and correct my standing. Please confirm the outcome of your review.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}

@@ -13,3 +13,7 @@ I arrived within the permitted check-in window, but the app displayed “Late Sc
 Please review the check-in records and the app error for this block. I request that any incorrect missed-block entry be removed and that my standing be corrected if it was affected. Please also review whether payment is due for this block.
 
 Please confirm the outcome of your review.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}

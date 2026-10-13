@@ -13,3 +13,7 @@ The deliveries recorded as late had only a minor delay of no more than five minu
 Please review the applicable delivery deadlines, recorded delivery timestamps, and any circumstances described below. Given the minimal delay, I ask that these entries be removed and my standing corrected.
 
 Please confirm the outcome of your review.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}

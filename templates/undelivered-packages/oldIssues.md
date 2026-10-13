@@ -13,3 +13,7 @@ These entries have remained in my standing for more than two months and are stil
 Please review why these entries remain active and remove them from my standing. If you decide that they must remain, explain how long they are expected to affect my standing, what determines their removal, and why they are still affecting it after more than two months.
 
 Please provide a specific response about these entries and confirm any correction to my standing.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}

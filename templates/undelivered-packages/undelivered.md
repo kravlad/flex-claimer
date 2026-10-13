@@ -15,3 +15,7 @@ I do not consent to unpaid work beyond my scheduled block. I should not be penal
 Please review the assigned package count, route distance, delivery timestamps, and the time I ended the block in the app. Remove the undelivered-package entries resulting from this excessive workload from my delivery history and correct my standing.
 
 Please confirm that these entries have been removed and my standing has been corrected.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}

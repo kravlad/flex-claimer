@@ -12,7 +12,6 @@
 //     endingAt          appended to {{block}} as " (… <end time>)" when only the end time is entered
 //     stationLabel      appended as "<stationLabel> <station>" when the template has no {{station}}
 //     detailsLabel      appended above the details when the template has no {{details}}
-//     unknownStartTime  appended when the block start time is not entered
 //     signoff           appended (followed by the name) when the template has no {{name}}
 //
 // translations/ru.json — Russian UI translations. English is the default language; keys are the English UI strings.
@@ -41,7 +40,7 @@ const sourceFile = path.join(root, 'src', 'index.html');
 const outputFile = path.join(root, 'dist', 'index.html');
 const fields = ['label', 'hint', 'subject'];
 const optionalFields = ['group'];
-const emailTextKeys = ['missingDate', 'overnight', 'endingAt', 'stationLabel', 'detailsLabel', 'unknownStartTime', 'signoff'];
+const emailTextKeys = ['missingDate', 'overnight', 'endingAt', 'stationLabel', 'detailsLabel', 'signoff'];
 
 // Load the same scripts the page uses, so templates are checked by the page's own rules.
 const context = vm.createContext({});

@@ -15,3 +15,7 @@ These packages were not left undelivered because I refused to deliver them. The 
 Please review the delivery attempts and the circumstances described in this email. Remove these undelivered-package entries from my delivery history and correct my standing, as the deliveries could not be completed for reasons outside my control.
 
 Please confirm that the entries have been removed and my standing has been corrected.
+
+{{#unless start}}
+Please do not ask me for the block start time, as I do not know it. The app shows only the date of the issue, not the time of the block in which it occurred. I cannot determine which specific block the issue occurred in. If I knew the block time, I would have included it.
+{{/unless}}
