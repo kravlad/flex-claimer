@@ -57,7 +57,7 @@
     if (saved && typeof saved === 'object') {
       for (const key of Object.keys(defaults)) {
         const t = saved.templates?.[key];
-        if (t && typeof t.subject === 'string' && typeof t.body === 'string' && !FlexTemplating.check(t.subject) && !FlexTemplating.check(t.body)) preferences.templates[key] = {subject:t.subject,body:t.body};
+        if (t && typeof t.subject === 'string' && typeof t.body === 'string' && !FlexTemplating.check(t.subject,t.body)) preferences.templates[key] = {subject:t.subject,body:t.body};
       }
       if(typeof saved.name === 'string')preferences.name=saved.name;
       if(saved.language==='en'||saved.language==='ru')preferences.language=saved.language;
@@ -75,7 +75,7 @@
   language=preferences.language || 'en';
   let edited = false, pending = false;
   function savePreferences() {
-    preferences.name = $('name').value.trim();
+    if(editedFields.has('name'))preferences.name = $('name').value.trim();
     preferences.language = language;
     preferences.addresses={custom:$('emailCustom').value.trim()};
     try {localStorage.setItem(STORAGE_KEY,JSON.stringify(preferences));return true;} catch {return false;}
@@ -83,10 +83,11 @@
   function activeTemplate(){return preferences.templates[$('type').value] || defaults[$('type').value];}
   const fieldIds = ['date', 'start', 'end', 'station', 'name', 'details'];
   const fieldInputs = new Map(fieldIds.map(id=>[id,$(id)]));
+  const editedFields = new Set(preferences.name?['name']:[]);
   let activeFields = new Set();
   function addCustomField(key){
     const field=document.createElement('div');field.className='field custom-field';
-    const input=document.createElement('input');input.type='text';input.id=`customFieldInput-${key}`;input.autocomplete='off';
+    const input=document.createElement('input');input.type='text';input.id=`customFieldInput-${key}`;input.autocomplete='off';input.dataset.fieldKey=key;
     const label=document.createElement('label');label.htmlFor=input.id;label.append(document.createTextNode(key+' '));
     const requirement=document.createElement('span');requirement.className='optional';requirement.id=`customFieldRequirement-${key}`;label.append(requirement);
     field.append(label,input);$('customFields').append(field);
@@ -108,6 +109,7 @@
       input.closest('.field').hidden=!visible;
       input.disabled=!visible;
       input.required=visible&&requiredFields.has(key);
+      if(visible&&!editedFields.has(key))input.value=rules.defaults[key]??'';
       input.setCustomValidity('');
       const requirementId=fieldIds.includes(key)?`${key}Requirement`:`customFieldRequirement-${key}`;
       setUiText(requirementId,input.required?'· required':'· optional');
@@ -138,10 +140,9 @@
     return data;
   }
   function fill(template,data){
-    if(!data.start)template=template.replace(/,\s*\{\{\s*(?:req:)?start\s*\}\}/g,'');
-    return FlexTemplating.render(template,data);
+    return FlexTemplating.render(template,data,{omitEmptyStartComma:true});
   }
-  function contains(template,key){return new RegExp('\\{\\{\\s*(?:req:)?'+key+'\\s*\\}\\}').test(template);}
+  function contains(template,key){return FlexTemplating.interpolates(template,key);}
   function render(){
     const t=activeTemplate(),data=values();
     $('subject').value=fill(t.subject,data);
@@ -156,7 +157,7 @@
     setUiText('actionStatus','');
     if(edited){pending=true;$('pendingNotice').hidden=false;}else render();
   }
-  function fieldChanged(event){event.target.setCustomValidity('');parametersChanged();}
+  function fieldChanged(event){editedFields.add(event.target.dataset.fieldKey||event.target.id);event.target.setCustomValidity('');parametersChanged();}
   function loadEditor(){
     const t=activeTemplate();$('templateSubject').value=t.subject;$('templateBody').value=t.body;
     updateFields(t);
@@ -182,7 +183,7 @@
   $('saveTemplate').addEventListener('click',()=>{
     const subject=$('templateSubject').value.trim(),body=$('templateBody').value.trim();
     if(!subject||!body){setUiText('templateStatus','Enter a template subject and body.');return;}
-    const problem=FlexTemplating.check(subject)||FlexTemplating.check(body);
+    const problem=FlexTemplating.check(subject,body);
     if(problem){setUiText('templateStatus',problem.message,problem.detail);return;}
     replaceTemplate(()=>{preferences.templates[$('type').value]={subject,body};});
   });

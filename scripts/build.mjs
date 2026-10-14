@@ -98,10 +98,8 @@ function parseTemplate(file, ru) {
   for (const key of optionalFields) if (key in template && !template[key]) errors.push(`${file}: "${key}" is empty (remove the line to leave the template without it)`);
   template.body = match[2].trim();
   if (!template.body) errors.push(`${file}: the email body is empty`);
-  for (const key of ['subject', 'body']) {
-    const problem = template[key] && check(template[key]);
-    if (problem) errors.push(`${file}: ${key}: ${problem.message}${problem.detail}`);
-  }
+  const problem = check(template.subject || '', template.body);
+  if (problem) errors.push(`${file}: template: ${problem.message}${problem.detail}`);
   for (const key of ['label', 'hint']) {
     if (template[key] && ru && !(template[key] in ru)) warnings.push(`${file}: ${key} has no Russian translation in translations/ru.json`);
   }

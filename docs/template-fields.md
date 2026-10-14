@@ -43,3 +43,28 @@ required status. Browser-saved templates retain their own references and recreat
 when selected after a reload. Values are kept while switching or editing templates
 in the current page; custom input values are not stored across page reloads.
 Restoring the default template loads the current repository version.
+
+## Default values
+
+Add one quoted value after a variable to prefill its input:
+
+```handlebars
+Day: {{weekday "Monday"}}
+Station (required): {{req:station "DAX5"}}
+Date: {{date "2026-10-13"}}
+Start: {{start "09:00"}}
+```
+
+Defaults work with standard and custom fields, with or without `req:`. Use a
+valid `YYYY-MM-DD` date and `HH:mm` time. For `block`, set defaults on `date`,
+`start`, and `end` separately. Dates and times keep their usual email formatting.
+
+Applying or switching templates updates untouched inputs to the template's
+defaults. Once you edit or clear a field, your input takes priority for the rest
+of the current page session, even after switching templates. Clearing a default
+leaves the field empty; a required field then needs a new value.
+
+Default values are saved as part of the template and applied again after a
+reload. Your saved name takes priority over a template default. Repeated
+references share one input and may omit the default or repeat the same value;
+different defaults for the same field in the subject or body are rejected.

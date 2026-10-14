@@ -6,7 +6,8 @@ From the repository root, with Node 22:
 node --test
 ```
 
-This runs the template rendering, field visibility, and required field detection tests using the
+This runs the template rendering, field visibility, required field detection,
+and default value syntax/validation tests using the
 vendored Handlebars library, without installing npm dependencies.
 
 Browser checks use Python 3 and Playwright. Install Playwright in a virtual
@@ -24,6 +25,7 @@ python3 tests/optional-fields.browser.py
 The browser suite loads the built HTML through a local Playwright route; it needs
 no server or external network access. Each test gets fresh browser storage. It
 checks default templates, template editing/reset/persistence, conditions and
-comments, required field validation, custom text fields, hidden values, manual
+comments, required field validation, custom text fields, defaults and manual
+input priority (including cleared fields), hidden values, manual
 drafts, time field layout, and the Russian mobile form. Template syntax is documented in
 [template-fields.md](../docs/template-fields.md). It generates no email and sends nothing.

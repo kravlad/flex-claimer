@@ -1,7 +1,6 @@
-// Email template checking and rendering with Handlebars, shared by src/index.html and scripts/build.mjs.
-// Templates may use the standard variables below, custom text variables, and
-// {{#if var}}…{{else}}…{{/if}} / {{#unless var}}…{{/unless}}.
-// Prefix a variable with req: to require its field. req:block requires date, start and end.
+// Email template checking and rendering with Handlebars, shared by the page and build.
+// Standard/custom variables support req: and one quoted default, e.g. {{weekday "Monday"}}.
+// req:block requires date, start and end; set defaults on those individual fields.
 (root => {
   'use strict';
   const variables = ['date', 'start', 'end', 'block', 'station', 'name', 'details'];
@@ -10,72 +9,117 @@
   const reservedNames = new Set(['this', 'true', 'false', 'null', 'undefined', 'prototype', ...Object.getOwnPropertyNames(Object.prototype), ...Object.keys(root.Handlebars.helpers)]);
   const validVariable = name => /^[A-Za-z][A-Za-z0-9_]*$/.test(baseVariable(name)) && !reservedNames.has(baseVariable(name));
 
-  // Returns null for a valid template, or {message, detail} for the first problem found.
-  // `message` is a UI string (translated by the page), `detail` is the offending template text.
-  function check(source) {
-    let ast;
-    try {
-      ast = root.Handlebars.parse(source);
-    } catch (error) {
-      const lines = error.message.split('\n');
-      return {message: 'Template error: ', detail: [lines[0], lines[lines.length - 1]].join(' ')};
+  // Visit statements in source order, including both branches of conditions.
+  function* statements(program) {
+    for (let index = 0; index < program.body.length; index++) {
+      const node = program.body[index];
+      yield {node, body: program.body, index};
+      if (node.program) yield* statements(node.program);
+      if (node.inverse) yield* statements(node.inverse);
     }
-    const lineStarts = [0];
-    for (let i = source.indexOf('\n'); i !== -1; i = source.indexOf('\n', i + 1)) lineStarts.push(i + 1);
-    const opening = node => {
-      const start = lineStarts[node.loc.start.line - 1] + node.loc.start.column;
-      return source.slice(start, source.indexOf('}}', start) + 2);
-    };
-    const pending = [...ast.body];
-    while (pending.length) {
-      const node = pending.shift();
-      if (node.type === 'ContentStatement' || node.type === 'CommentStatement') continue;
-      if (node.type === 'MustacheStatement' && node.path.type === 'PathExpression' && !node.params.length && !node.hash) {
-        if (!validVariable(node.path.original)) return {message: 'Invalid variable name: ', detail: opening(node)};
-        continue;
+  }
+
+  function validDefault(key, value) {
+    if (key === 'block') return false;
+    if (value === '') return true;
+    if (key === 'start' || key === 'end') return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
+    if (key === 'date') {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000-')) return false;
+      const date = new Date(`${value}T12:00:00Z`);
+      return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    }
+    return true;
+  }
+
+  // Returns null for valid sources, or {message, detail} for the first problem.
+  // Checking the subject and body together also detects conflicting defaults.
+  function check(...sources) {
+    const defaults = new Map();
+    for (const source of sources) {
+      let ast;
+      try {
+        ast = root.Handlebars.parse(source);
+      } catch (error) {
+        const lines = error.message.split('\n');
+        return {message: 'Template error: ', detail: [lines[0], lines[lines.length - 1]].join(' ')};
       }
-      if (node.type === 'BlockStatement' && blockHelpers.includes(node.path.original) && node.params.length === 1 && !node.hash && node.params[0].type === 'PathExpression') {
-        if (!validVariable(node.params[0].original)) return {message: 'Invalid variable name: ', detail: opening(node)};
-        pending.push(...node.program.body, ...(node.inverse ? node.inverse.body : []));
-        continue;
+      const lineStarts = [0];
+      for (let i = source.indexOf('\n'); i !== -1; i = source.indexOf('\n', i + 1)) lineStarts.push(i + 1);
+      const opening = node => {
+        const start = lineStarts[node.loc.start.line - 1] + node.loc.start.column;
+        return source.slice(start, source.indexOf('}}', start) + 2);
+      };
+      for (const {node} of statements(ast)) {
+        if (node.type === 'ContentStatement' || node.type === 'CommentStatement') continue;
+        if (node.type === 'MustacheStatement' && node.path.type === 'PathExpression' && !node.hash &&
+            (!node.params.length || (node.params.length === 1 && node.params[0].type === 'StringLiteral'))) {
+          if (!validVariable(node.path.original)) return {message: 'Invalid variable name: ', detail: opening(node)};
+          if (node.params.length) {
+            const key = baseVariable(node.path.original), value = node.params[0].value;
+            if (!validDefault(key, value)) return {message: 'Invalid default value: ', detail: opening(node)};
+            if (defaults.has(key) && defaults.get(key) !== value) return {message: 'Conflicting default values: ', detail: key};
+            defaults.set(key, value);
+          }
+          continue;
+        }
+        if (node.type === 'BlockStatement' && blockHelpers.includes(node.path.original) && node.params.length === 1 && !node.hash && node.params[0].type === 'PathExpression') {
+          if (!validVariable(node.params[0].original)) return {message: 'Invalid variable name: ', detail: opening(node)};
+          continue;
+        }
+        return {message: 'Template error: ', detail: opening(node)};
       }
-      return {message: 'Template error: ', detail: opening(node)};
     }
     return null;
   }
 
-  // Plain-text output: Handlebars' HTML escaping is turned off.
-  function render(source, data) {
+  // Defaults initialize form fields; they never replace an explicitly empty value.
+  function render(source, data, {omitEmptyStartComma = false} = {}) {
+    const ast = root.Handlebars.parse(source);
+    for (const {node, body, index} of statements(ast)) {
+      if (node.type !== 'MustacheStatement') continue;
+      node.params = [];
+      if (omitEmptyStartComma && !data.start && baseVariable(node.path.original) === 'start') {
+        const previous = body[index - 1];
+        if (previous?.type === 'ContentStatement') {
+          previous.value = previous.value.replace(/,\s*$/, '');
+          previous.original = previous.value;
+        }
+      }
+    }
     const values = {...data};
     for (const [key, value] of Object.entries(data)) values[`req:${key}`] = value;
-    return root.Handlebars.compile(source, {noEscape: true})(values);
+    return root.Handlebars.compile(ast, {noEscape: true})(values);
   }
 
-  // Inspect the active, validated template rather than rendered text: conditions
-  // refer to fields even when their branch is empty, but comments do not.
+  function interpolates(source, key) {
+    for (const {node} of statements(root.Handlebars.parse(source))) {
+      if (node.type === 'MustacheStatement' && baseVariable(node.path.original) === key) return true;
+    }
+    return false;
+  }
+
+  // Inspect validated sources, including conditions but excluding comments.
   function fields(...sources) {
-    const used = new Set();
-    const required = new Set();
+    const used = new Set(), required = new Set(), defaults = Object.create(null);
     const add = name => {
       const key = baseVariable(name);
-      const keys = key === 'block' ? ['date', 'start', 'end'] : [key];
-      for (const field of keys) {
+      for (const field of key === 'block' ? ['date', 'start', 'end'] : [key]) {
         used.add(field);
         if (name.startsWith('req:')) required.add(field);
       }
     };
-    const pending = sources.flatMap(source => root.Handlebars.parse(source).body).reverse();
-    while (pending.length) {
-      const node = pending.pop();
-      if (node.type === 'MustacheStatement') add(node.path.original);
-      if (node.type === 'BlockStatement') {
-        for (const param of node.params) add(param.original);
-        pending.push(...[...node.program.body, ...(node.inverse ? node.inverse.body : [])].reverse());
+    for (const source of sources) {
+      for (const {node} of statements(root.Handlebars.parse(source))) {
+        if (node.type === 'MustacheStatement') {
+          add(node.path.original);
+          if (node.params.length) defaults[baseVariable(node.path.original)] = node.params[0].value;
+        }
+        if (node.type === 'BlockStatement') for (const param of node.params) add(param.original);
       }
     }
     const keys = [...variables.filter(key => key !== 'block'), ...[...used].filter(key => !variables.includes(key))];
-    return {visible: keys.filter(key => used.has(key)), required: keys.filter(key => required.has(key))};
+    return {visible: keys.filter(key => used.has(key)), required: keys.filter(key => required.has(key)), defaults};
   }
 
-  root.FlexTemplating = {variables, check, render, fields};
+  root.FlexTemplating = {variables, check, render, fields, interpolates};
 })(window);

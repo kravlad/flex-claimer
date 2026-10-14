@@ -421,5 +421,111 @@ class OptionalFieldsTests(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
 
 
+    def test_default_custom_value_prefills_the_input_and_email(self):
+        self.apply_template('Day {{weekday "Monday"}}', 'Day: {{weekday}}')
+        self.custom_fields_are(['weekday'])
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Day Monday')
+        self.assertIn('Day: Monday', self.page.locator('#body').input_value())
+        self.page.locator('#createEmail').click()
+        self.assertIsNotNone(self.mailto())
+
+    def test_default_value_satisfies_required_fields_and_manual_clear_stays_empty(self):
+        self.apply_template('Request', 'Day {{req:weekday "Monday"}}')
+        self.custom_fields_are(['weekday'], ['weekday'])
+        self.page.locator('#createEmail').click()
+        self.assertIsNotNone(self.mailto())
+        self.custom_field('weekday').fill('')
+        self.page.evaluate('window.testMailto = null')
+        self.page.locator('#createEmail').click()
+        self.assertIsNone(self.mailto())
+        self.assertEqual(self.custom_field('weekday').input_value(), '')
+        self.choose('accountPause')
+        self.choose('custom')
+        self.assertEqual(self.custom_field('weekday').input_value(), '')
+        self.apply_template('Request', 'Day {{weekday "Tuesday"}}')
+        self.assertEqual(self.custom_field('weekday').input_value(), '')
+        self.page.locator('#createEmail').click()
+        self.assertIsNotNone(self.mailto())
+
+    def test_manual_values_have_priority_over_changed_defaults(self):
+        self.apply_template('Request', 'Day {{weekday "Monday"}}')
+        self.custom_field('weekday').fill('Wednesday')
+        self.apply_template('Request', 'Day {{weekday "Tuesday"}}')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Wednesday')
+        self.choose('accountPause')
+        self.choose('custom')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Wednesday')
+
+    def test_untouched_values_follow_template_defaults_and_reload(self):
+        self.apply_template('Request', 'Day {{weekday "Monday"}}')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+        self.apply_template('Request', 'Day {{weekday "Tuesday"}}')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Tuesday')
+        self.apply_template('Request', 'Day {{weekday}}')
+        self.assertEqual(self.custom_field('weekday').input_value(), '')
+        self.apply_template('Request', 'Day {{weekday "Thursday"}}')
+        self.page.reload()
+        self.choose('custom')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Thursday')
+
+    def test_native_date_and_time_defaults_use_input_formats_and_render_formatted_values(self):
+        self.page.goto(URL)
+        self.apply_template('Date {{req:date "2026-10-13"}}', '{{start "09:00"}} {{end "13:00"}} {{block}}')
+        self.fields_are(['date', 'start', 'end'], ['date'])
+        self.assertEqual(self.page.locator('#date').input_value(), '2026-10-13')
+        self.assertEqual(self.page.locator('#start').input_value(), '09:00')
+        self.assertEqual(self.page.locator('#end').input_value(), '13:00')
+        self.assertIn('October 13, 2026', self.page.locator('#subject').input_value())
+        self.assertIn('9:00 AM–1:00 PM', self.page.locator('#body').input_value())
+
+    def test_default_standard_text_values_are_not_appended_twice(self):
+        self.apply_template('Request', '{{req:station "DAX5"}} {{name "Test Driver"}} {{details "Extra details"}}')
+        self.fields_are(['station', 'name', 'details'], ['station'])
+        body = self.page.locator('#body').input_value()
+        for value in ['DAX5', 'Test Driver', 'Extra details']:
+            self.assertEqual(body.count(value), 1)
+
+    def test_default_name_does_not_become_a_manual_preference(self):
+        self.apply_template('Request', '{{name "Default One"}}')
+        self.assertEqual(self.page.locator('#name').input_value(), 'Default One')
+        self.page.locator('#language').select_option('ru')
+        self.page.reload()
+        self.choose('custom')
+        self.apply_template('Request', '{{name "Default Two"}}')
+        self.assertEqual(self.page.locator('#name').input_value(), 'Default Two')
+
+    def test_persisted_manual_name_wins_over_a_default(self):
+        self.choose('accountPause')
+        self.page.locator('#name').fill('My Name')
+        self.page.locator('#name').blur()
+        self.page.reload()
+        self.apply_template('Request', '{{name "Template Name"}}')
+        self.assertEqual(self.page.locator('#name').input_value(), 'My Name')
+
+    def test_clearing_default_start_removes_the_subject_comma(self):
+        self.apply_template('Request {{date}}, {{start "09:00"}}', 'Hello support.')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Request October 1, 2026, 9:00 AM')
+        self.page.locator('#start').fill('')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Request October 1, 2026')
+        self.page.locator('#body').fill('Manual draft')
+        self.page.locator('#date').fill('2026-10-02')
+        self.assertTrue(self.page.locator('#pendingNotice').is_visible())
+        self.page.locator('#regenerate').click()
+        self.assertEqual(self.page.locator('#start').input_value(), '')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Request October 2, 2026')
+
+    def test_conflicting_defaults_are_rejected_without_changing_the_active_template(self):
+        self.apply_template('Day {{weekday "Monday"}}', 'Day {{weekday}}')
+        self.page.locator('#templateSubject').fill('Day {{weekday "Tuesday"}}')
+        self.page.locator('#templateBody').fill('Day {{weekday "Wednesday"}}')
+        self.page.locator('#saveTemplate').click()
+        self.assertIn('Conflicting default', self.page.locator('#templateStatus').inner_text())
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+        self.page.reload()
+        self.choose('custom')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

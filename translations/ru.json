@@ -100,5 +100,8 @@
   "Check-in & standing": "Регистрация и standing",
   "Undelivered packages": "Недоставленные посылки",
   "Late deliveries": "Опоздания",
-  "Pay & time": "Оплата и время"
+  "Pay & time": "Оплата и время",
+  "Add a quoted default to prefill a field: {{weekday \"Monday\"}} or {{req:station \"DAX5\"}}. Use YYYY-MM-DD for dates and HH:mm for times. For block, set defaults on date, start, and end separately. Applying a template updates untouched fields; values you edit or clear take priority.": "Чтобы задать значение по умолчанию, добавь его в кавычках: {{weekday \"Monday\"}} или {{req:station \"DAX5\"}}. Для даты используй YYYY-MM-DD, для времени — HH:mm. Для block задай значения отдельно для date, start и end. Применение шаблона обновляет нетронутые поля; введённые или очищенные вручную значения имеют приоритет.",
+  "Invalid default value: ": "Недопустимое значение по умолчанию: ",
+  "Conflicting default values: ": "Разные значения по умолчанию для поля: "
 }
