@@ -1,11 +1,14 @@
 // Email template checking and rendering with Handlebars, shared by src/index.html and scripts/build.mjs.
-// Templates may use the variables below and {{#if var}}…{{else}}…{{/if}} / {{#unless var}}…{{/unless}}.
+// Templates may use the standard variables below, custom text variables, and
+// {{#if var}}…{{else}}…{{/if}} / {{#unless var}}…{{/unless}}.
 // Prefix a variable with req: to require its field. req:block requires date, start and end.
 (root => {
   'use strict';
   const variables = ['date', 'start', 'end', 'block', 'station', 'name', 'details'];
   const blockHelpers = ['if', 'unless'];
   const baseVariable = name => name.startsWith('req:') ? name.slice(4) : name;
+  const reservedNames = new Set(['this', 'true', 'false', 'null', 'undefined', 'prototype', ...Object.getOwnPropertyNames(Object.prototype), ...Object.keys(root.Handlebars.helpers)]);
+  const validVariable = name => /^[A-Za-z][A-Za-z0-9_]*$/.test(baseVariable(name)) && !reservedNames.has(baseVariable(name));
 
   // Returns null for a valid template, or {message, detail} for the first problem found.
   // `message` is a UI string (translated by the page), `detail` is the offending template text.
@@ -28,11 +31,11 @@
       const node = pending.shift();
       if (node.type === 'ContentStatement' || node.type === 'CommentStatement') continue;
       if (node.type === 'MustacheStatement' && node.path.type === 'PathExpression' && !node.params.length && !node.hash) {
-        if (!variables.includes(baseVariable(node.path.original))) return {message: 'Unknown variable: ', detail: opening(node)};
+        if (!validVariable(node.path.original)) return {message: 'Invalid variable name: ', detail: opening(node)};
         continue;
       }
       if (node.type === 'BlockStatement' && blockHelpers.includes(node.path.original) && node.params.length === 1 && !node.hash && node.params[0].type === 'PathExpression') {
-        if (!variables.includes(baseVariable(node.params[0].original))) return {message: 'Unknown variable: ', detail: opening(node)};
+        if (!validVariable(node.params[0].original)) return {message: 'Invalid variable name: ', detail: opening(node)};
         pending.push(...node.program.body, ...(node.inverse ? node.inverse.body : []));
         continue;
       }
@@ -44,7 +47,7 @@
   // Plain-text output: Handlebars' HTML escaping is turned off.
   function render(source, data) {
     const values = {...data};
-    for (const key of variables) values[`req:${key}`] = data[key];
+    for (const [key, value] of Object.entries(data)) values[`req:${key}`] = value;
     return root.Handlebars.compile(source, {noEscape: true})(values);
   }
 
@@ -61,16 +64,16 @@
         if (name.startsWith('req:')) required.add(field);
       }
     };
-    const pending = sources.flatMap(source => root.Handlebars.parse(source).body);
+    const pending = sources.flatMap(source => root.Handlebars.parse(source).body).reverse();
     while (pending.length) {
       const node = pending.pop();
       if (node.type === 'MustacheStatement') add(node.path.original);
       if (node.type === 'BlockStatement') {
         for (const param of node.params) add(param.original);
-        pending.push(...node.program.body, ...(node.inverse ? node.inverse.body : []));
+        pending.push(...[...node.program.body, ...(node.inverse ? node.inverse.body : [])].reverse());
       }
     }
-    const keys = variables.filter(key => key !== 'block');
+    const keys = [...variables.filter(key => key !== 'block'), ...[...used].filter(key => !variables.includes(key))];
     return {visible: keys.filter(key => used.has(key)), required: keys.filter(key => required.has(key))};
   }
 

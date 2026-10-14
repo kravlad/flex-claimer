@@ -1,4 +1,5 @@
 """Browser regression checks; build dist/index.html before running this file."""
+import re
 import shutil
 import unittest
 from pathlib import Path
@@ -272,6 +273,152 @@ class OptionalFieldsTests(unittest.TestCase):
         self.assertTrue(self.page.locator('#body').input_value().startswith('9:00 AM–1:00 PM'))
         self.page.locator('#start').fill('')
         self.assertTrue(self.page.locator('#body').input_value().startswith('(ending at 1:00 PM)'))
+
+
+    def custom_field(self, name):
+        return self.page.locator('#customFields').get_by_label(re.compile(r'^' + re.escape(name) + r'\s+·\s*(?:optional|required|необязательно|обязательно)$'))
+
+    def custom_fields_are(self, expected, required=()):
+        self.assertEqual(self.page.locator('#customFields input:visible').count(), len(expected))
+        for name in expected:
+            with self.subTest(custom_field=name):
+                field = self.custom_field(name)
+                self.assertEqual(field.count(), 1)
+                self.assertTrue(field.is_visible())
+                self.assertFalse(field.is_disabled())
+                self.assertEqual(field.get_attribute('type'), 'text')
+                self.assertEqual(field.evaluate('el => el.required'), name in required)
+
+    def test_custom_variable_creates_one_text_field_after_applying_the_template(self):
+        self.page.locator('#templateSubject').fill('Request for {{weekday}}')
+        self.page.locator('#templateBody').fill('Day: {{weekday}}. Again: {{weekday}}.')
+        self.assertEqual(self.custom_field('weekday').count(), 0)
+        self.page.locator('#saveTemplate').click()
+        self.custom_fields_are(['weekday'])
+        self.custom_field('weekday').fill('Tuesday')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Request for Tuesday')
+        self.assertEqual(self.page.locator('#body').input_value().count('Tuesday'), 2)
+        self.assertNotIn('{{weekday}}', self.page.locator('#body').input_value())
+
+    def test_required_custom_field_checks_whitespace_and_becomes_optional(self):
+        self.apply_template('Request', 'Day: {{req:weekday}}')
+        self.custom_fields_are(['weekday'], ['weekday'])
+        self.custom_field('weekday').fill('   ')
+        self.page.locator('#createEmail').click()
+        self.assertIsNone(self.mailto())
+        self.custom_field('weekday').fill('Tuesday')
+        self.page.locator('#createEmail').click()
+        self.assertIsNotNone(self.mailto())
+        self.assertIn('Tuesday', self.mailto())
+        self.apply_template('Request', 'Day: {{weekday}}')
+        self.custom_fields_are(['weekday'])
+        self.custom_field('weekday').fill('')
+        self.page.evaluate('window.testMailto = null')
+        self.page.locator('#createEmail').click()
+        self.assertIsNotNone(self.mailto())
+
+    def test_custom_values_survive_switching_removal_and_readding_the_variable(self):
+        self.apply_template('Request', 'Day: {{req:weekday}}')
+        self.custom_field('weekday').fill('Monday')
+        self.choose('accountPause')
+        self.custom_fields_are([])
+        self.assertFalse(self.custom_field('weekday').is_visible())
+        self.assertTrue(self.custom_field('weekday').is_disabled())
+        self.assertNotIn('Monday', self.page.locator('#body').input_value())
+        self.choose('custom')
+        self.custom_fields_are(['weekday'], ['weekday'])
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+        self.apply_template('Request', 'No custom fields.')
+        self.custom_fields_are([])
+        self.page.locator('#createEmail').click()
+        self.assertIsNotNone(self.mailto())
+        self.assertNotIn('Monday', self.mailto())
+        self.apply_template('Request', 'Day: {{weekday}}')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+        self.assertIn('Monday', self.page.locator('#body').input_value())
+
+    def test_saved_template_recreates_custom_fields_after_reload_and_reset_hides_them(self):
+        self.apply_template('Route {{req:route_id}}', 'Day: {{weekday}}')
+        self.custom_fields_are(['route_id', 'weekday'], ['route_id'])
+        self.page.reload()
+        self.choose('custom')
+        self.custom_fields_are(['route_id', 'weekday'], ['route_id'])
+        self.page.locator('#resetTemplate').click()
+        self.custom_fields_are([])
+        self.fields_are(['date', 'start'], ['date'])
+
+    def test_custom_conditions_activate_fields_and_comments_do_not(self):
+        self.apply_template('{{!-- {{req:ignored}} --}}Request',
+                            '{{#if weekday}}Day set.{{else}}No day.{{/if}} {{#unless req:route_id}}No route.{{/unless}}')
+        self.custom_fields_are(['weekday', 'route_id'], ['route_id'])
+        self.assertEqual(self.custom_field('ignored').count(), 0)
+        self.assertIn('No day.', self.page.locator('#body').input_value())
+        self.custom_field('weekday').fill('Tuesday')
+        self.custom_field('route_id').fill('ROUTE1')
+        body = self.page.locator('#body').input_value()
+        self.assertIn('Day set.', body)
+        self.assertNotIn('No route.', body)
+        self.assertNotIn('Tuesday', body)
+        self.assertNotIn('ROUTE1', body)
+
+    def test_custom_field_names_do_not_replace_existing_form_controls(self):
+        self.apply_template('Request {{req:subject}}', '{{type}} {{body}} {{language}}')
+        self.custom_fields_are(['subject', 'type', 'body', 'language'], ['subject'])
+        for name, value in [('subject', 'SUBJECT1'), ('type', 'TYPE1'), ('body', 'BODY1'), ('language', 'LANGUAGE1')]:
+            self.custom_field(name).fill(value)
+        self.assertEqual(self.page.locator('#type').input_value(), 'custom')
+        self.assertEqual(self.page.locator('#language').input_value(), 'en')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Request SUBJECT1')
+        self.assertIn('TYPE1 BODY1 LANGUAGE1', self.page.locator('#body').input_value())
+        for name in ['type', 'subject', 'body', 'language']:
+            self.assertEqual(self.page.locator(f'#{name}').count(), 1)
+
+    def test_custom_fields_preserve_standard_control_types_and_translate_their_markers(self):
+        self.apply_template('Request {{date}}', '{{start}} {{details}} {{req:weekday}}')
+        self.fields_are(['date', 'start', 'details'])
+        self.custom_fields_are(['weekday'], ['weekday'])
+        self.assertEqual(self.page.locator('#date').get_attribute('type'), 'date')
+        self.assertEqual(self.page.locator('#start').get_attribute('type'), 'time')
+        self.assertEqual(self.page.locator('#details').evaluate('el => el.tagName'), 'TEXTAREA')
+        self.page.set_viewport_size({'width': 375, 'height': 812})
+        self.page.locator('#language').select_option('ru')
+        label = self.page.locator('#customFields label').inner_text()
+        self.assertIn('weekday', label)
+        self.assertIn('· обязательно', label)
+        self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+
+    def test_custom_fields_update_without_overwriting_a_manual_draft(self):
+        self.apply_template('Request', 'Day: {{weekday}}')
+        self.custom_field('weekday').fill('Monday')
+        self.page.locator('#body').fill('My manual draft')
+        self.choose('accountPause')
+        self.custom_fields_are([])
+        self.assertEqual(self.page.locator('#body').input_value(), 'My manual draft')
+        self.page.locator('#regenerate').click()
+        self.assertNotIn('Monday', self.page.locator('#body').input_value())
+        self.choose('custom')
+        self.assertEqual(self.custom_field('weekday').input_value(), 'Monday')
+        self.assertIn('Monday', self.page.locator('#body').input_value())
+
+
+    def test_long_custom_field_labels_wrap_on_mobile(self):
+        name = 'long_' * 30 + 'field'
+        self.page.set_viewport_size({'width': 375, 'height': 812})
+        self.apply_template('Request', '{{' + name + '}}')
+        self.custom_fields_are([name])
+        self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+
+
+    def test_custom_field_names_do_not_collide_with_requirement_marker_ids(self):
+        self.apply_template('Day {{weekday}}', 'Note: {{req:weekdayRequirement}}')
+        self.assertEqual(self.custom_field('weekdayRequirement').count(), 1)
+        self.custom_fields_are(['weekday', 'weekdayRequirement'], ['weekdayRequirement'])
+        self.custom_field('weekday').fill('Tuesday')
+        self.custom_field('weekdayRequirement').fill('Extra note')
+        self.assertEqual(self.page.locator('#subject').input_value(), 'Day Tuesday')
+        self.assertIn('Extra note', self.page.locator('#body').input_value())
+        ids = self.page.locator('[id]').evaluate_all('elements => elements.map(el => el.id)')
+        self.assertEqual(len(ids), len(set(ids)))
 
 
 if __name__ == '__main__':

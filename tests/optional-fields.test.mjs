@@ -34,6 +34,14 @@ const cases = [
   ['one required time leaves other block fields optional', '{{req:start}}', '{{block}}', ['date', 'start', 'end'], ['start']],
   ['required condition parameter', 'Request', '{{#if req:station}}Known station.{{/if}}', ['station'], ['station']],
   ['required marker in an inverse branch', 'Request', '{{#if name}}{{name}}{{else}}{{req:details}}{{/if}}', ['name', 'details'], ['details']],
+  ['custom text field', 'Request', '{{weekday}}', ['weekday'], []],
+  ['required custom field', '{{req:weekday}}', 'Request', ['weekday'], ['weekday']],
+  ['repeated custom references create one field', '{{weekday}}', '{{weekday}} {{req:weekday}}', ['weekday'], ['weekday']],
+  ['custom fields keep their first appearance order', '{{route_id}}', '{{weekday}} {{notes}} {{route_id}}', ['route_id', 'weekday', 'notes'], []],
+  ['custom fields follow the standard fields', '{{name}} {{route_id}}', '{{weekday}} {{req:start}}', ['start', 'name', 'route_id', 'weekday'], ['start']],
+  ['custom condition variables and both branches', 'Request', '{{#if weekday}}{{req:route_id}}{{else}}{{notes}}{{/if}}', ['weekday', 'route_id', 'notes'], ['route_id']],
+  ['custom markers in comments are ignored', '{{!-- {{req:weekday}} --}}Request', '{{! {{route_id}} }}', [], []],
+  ['escaped custom expressions are literal', 'Request', '\\{{weekday}}', [], []],
 ];
 for (const [name, subject, body, visible, required] of cases) {
   test(name, () => {
@@ -59,8 +67,22 @@ test('required variables work in conditions without changing truthiness', () => 
   assert.equal(context.FlexTemplating.render(source, {...data, station: '', name: ''}), 'Unknown Anonymous');
   assert.equal(context.FlexTemplating.render(source, data), 'TEST1 ');
 });
-for (const source of ['{{req:unknown}}', '{{req:}}', '{{req:req:date}}', '{{other:date}}', '{{#if req:unknown}}Text{{/if}}']) {
+for (const source of ['{{req:}}', '{{req:req:date}}', '{{other:date}}', '{{weekday.name}}', '{{@weekday}}', '{{constructor}}', '{{req:constructor}}', '{{__proto__}}', '{{prototype}}', '{{if}}', '{{lookup}}', '{{req:helperMissing}}', '{{this}}', '{{req:this}}', '{{req:true}}', '{{req:false}}', '{{req:null}}', '{{req:undefined}}', '{{#if weekday.name}}Text{{/if}}']) {
   test(`unsupported variable remains invalid: ${source}`, () => {
     assert.ok(context.FlexTemplating.check(source));
   });
 }
+
+for (const key of ['weekday', 'route_id', 'Day2', 'type', 'subject', 'body', 'language']) {
+  test(`custom ${key} is accepted and rendered with or without req:`, () => {
+    const source = `{{${key}}} | {{req:${key}}}`;
+    assert.equal(context.FlexTemplating.check(source), null);
+    assert.equal(context.FlexTemplating.render(source, {[key]: 'Tuesday & Wednesday'}), 'Tuesday & Wednesday | Tuesday & Wednesday');
+  });
+}
+test('custom required variables preserve condition truthiness', () => {
+  const source = '{{#if req:weekday}}{{weekday}}{{else}}Unknown day{{/if}}';
+  assert.equal(context.FlexTemplating.check(source), null);
+  assert.equal(context.FlexTemplating.render(source, {weekday: ''}), 'Unknown day');
+  assert.equal(context.FlexTemplating.render(source, {weekday: 'Tuesday'}), 'Tuesday');
+});

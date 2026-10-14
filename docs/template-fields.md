@@ -11,8 +11,22 @@ Date (required): {{req:date}}
 Station (required): {{req:station}}
 ```
 
-This works for `date`, `start`, `end`, `station`, `name`, `details`, and `block`.
-If the same field has both plain and required references, it is required.
+The standard variables are `date`, `start`, `end`, `station`, `name`, `details`,
+and `block`. You can also add your own text variables:
+
+```handlebars
+Day (optional): {{weekday}}
+Route (required): {{req:route_id}}
+```
+
+After applying the template, each custom variable gets one text input labelled
+with its name. Repeated references share the same field. Names are case-sensitive,
+start with a Latin letter, and can contain letters, digits, and underscores.
+Nested paths are not supported; names such as `this`, `true`, `if`, `lookup`,
+and `constructor` are reserved.
+
+The `req:` prefix works with standard and custom variables. If the same field has
+both plain and required references, it is required.
 
 `{{block}}` shows the date, start time, and end time as optional fields.
 `{{req:block}}` requires all three. To require only the date while keeping the
@@ -25,5 +39,7 @@ date adds no placeholder text.
 
 Edit the references in a Markdown template or the browser's template editor.
 Applying, restoring, and switching templates updates both field visibility and
-required status. Browser-saved templates retain their own references; restoring
-the default template loads the current repository version.
+required status. Browser-saved templates retain their own references and recreate custom fields
+when selected after a reload. Values are kept while switching or editing templates
+in the current page; custom input values are not stored across page reloads.
+Restoring the default template loads the current repository version.

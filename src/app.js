@@ -82,18 +82,35 @@
   }
   function activeTemplate(){return preferences.templates[$('type').value] || defaults[$('type').value];}
   const fieldIds = ['date', 'start', 'end', 'station', 'name', 'details'];
+  const fieldInputs = new Map(fieldIds.map(id=>[id,$(id)]));
   let activeFields = new Set();
+  function addCustomField(key){
+    const field=document.createElement('div');field.className='field custom-field';
+    const input=document.createElement('input');input.type='text';input.id=`customFieldInput-${key}`;input.autocomplete='off';
+    const label=document.createElement('label');label.htmlFor=input.id;label.append(document.createTextNode(key+' '));
+    const requirement=document.createElement('span');requirement.className='optional';requirement.id=`customFieldRequirement-${key}`;label.append(requirement);
+    field.append(label,input);$('customFields').append(field);
+    input.addEventListener('input',fieldChanged);
+    fieldInputs.set(key,input);
+  }
   function updateFields(template){
     const rules=FlexTemplating.fields(template.subject,template.body);
     activeFields = new Set(rules.visible);
     const requiredFields=new Set(rules.required);
-    for(const id of fieldIds){
-      const visible=activeFields.has(id);
-      $(id).closest('.field').hidden=!visible;
-      $(id).disabled=!visible;
-      $(id).required=visible&&requiredFields.has(id);
-      $(id).setCustomValidity('');
-      setUiText(`${id}Requirement`,$(id).required?'· required':'· optional');
+    const customFields=rules.visible.filter(key=>!fieldIds.includes(key));
+    for(const key of customFields){
+      if(!fieldInputs.has(key))addCustomField(key);
+      $('customFields').append(fieldInputs.get(key).closest('.field'));
+    }
+    $('customFields').hidden=!customFields.length;
+    for(const [key,input] of fieldInputs){
+      const visible=activeFields.has(key);
+      input.closest('.field').hidden=!visible;
+      input.disabled=!visible;
+      input.required=visible&&requiredFields.has(key);
+      input.setCustomValidity('');
+      const requirementId=fieldIds.includes(key)?`${key}Requirement`:`customFieldRequirement-${key}`;
+      setUiText(requirementId,input.required?'· required':'· optional');
     }
     const timeRow=$('start').closest('.row');
     timeRow.hidden=!activeFields.has('start')&&!activeFields.has('end');
@@ -110,13 +127,15 @@
     return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'AM' : 'PM'}`;
   }
   function values(){
-    const value=id=>activeFields.has(id)?$(id).value:'';
+    const value=id=>activeFields.has(id)?fieldInputs.get(id).value:'';
     const startValue=value('start'),endValue=value('end');
     const date=formatDate(value('date')),start=formatTime(startValue),end=formatTime(endValue);
     const overnight=endValue && startValue && endValue < startValue;
     const time=start ? `${start}${end ? `–${end}${overnight?` (${emailText.overnight})`:''}`:''}` : end ? `(${emailText.endingAt} ${end})` : '';
     const block=[date,time].filter(Boolean).join(start?', ':' ');
-    return {date,start,end,block,station:value('station').trim(),name:value('name').trim(),details:value('details').trim()};
+    const data={date,start,end,block,station:value('station').trim(),name:value('name').trim(),details:value('details').trim()};
+    for(const key of activeFields)if(!fieldIds.includes(key))data[key]=value(key).trim();
+    return data;
   }
   function fill(template,data){
     if(!data.start)template=template.replace(/,\s*\{\{\s*(?:req:)?start\s*\}\}/g,'');
@@ -137,6 +156,7 @@
     setUiText('actionStatus','');
     if(edited){pending=true;$('pendingNotice').hidden=false;}else render();
   }
+  function fieldChanged(event){event.target.setCustomValidity('');parametersChanged();}
   function loadEditor(){
     const t=activeTemplate();$('templateSubject').value=t.subject;$('templateBody').value=t.body;
     updateFields(t);
@@ -144,7 +164,7 @@
     if($('type').value==='custom')$('templateEditor').open=true;
   }
   $('type').addEventListener('change',()=>{loadEditor();parametersChanged();});
-  for(const id of fieldIds)$(id).addEventListener('input',()=>{$(id).setCustomValidity('');parametersChanged();});
+  for(const id of fieldIds)$(id).addEventListener('input',fieldChanged);
   for(const id of ['subject','body'])$(id).addEventListener('input',()=>{edited=true;setUiText('draftBadge','Edited by you');setUiText('error','');setUiText('actionStatus','');});
   $('name').addEventListener('change',savePreferences);
   for(const {checkbox,email} of recipientRows){
@@ -169,8 +189,7 @@
   $('resetTemplate').addEventListener('click',()=>{if(!window.confirm(t('Restore the default template for this issue type?')))return;replaceTemplate(()=>{delete preferences.templates[$('type').value];});});
   function validate(){
     setUiText('error','');
-    for(const id of fieldIds){
-      const input=$(id);
+    for(const input of fieldInputs.values()){
       input.setCustomValidity(input.required&&!input.value.trim()?t('Fill in this required field.'):'');
     }
     if(!$('blockForm').reportValidity()){
