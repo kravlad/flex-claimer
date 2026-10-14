@@ -40,7 +40,7 @@
   "Template variables": "Переменные шаблона",
   "Subject template": "Шаблон темы",
   "Email template": "Шаблон письма",
-  "Fields appear when their variables are used in the subject or body template, including conditions. Prefix a variable with req: to require it, for example {{req:date}}. {{block}} includes the date and both times; {{req:block}} requires all three. An end time earlier than the start means the block ends the next day.": "Поля появляются, если их переменные используются в теме или тексте шаблона, в том числе в условиях. Префикс req: делает поле обязательным, например {{req:date}}. {{block}} включает дату, время начала и окончания; {{req:block}} требует заполнить все три поля. Если конец раньше начала, блок заканчивается на следующий день.",
+  "Fields appear when their variables are used in the subject or body template, including conditions. The req: prefix works with every variable: {{name}} is optional, {{req:name}} is required. {{block}} includes the date and both times; {{req:block}} requires all three. An end time earlier than the start means the block ends the next day.": "Поля появляются, если их переменные используются в теме или тексте шаблона, в том числе в условиях. Префикс req: работает со всеми переменными: {{name}} — необязательное имя, {{req:name}} — обязательное. {{block}} включает дату, время начала и окончания; {{req:block}} требует заполнить все три поля. Если конец раньше начала, блок заканчивается на следующий день.",
   "Apply and save": "Применить и сохранить",
   "Restore default": "Вернуть исходный",
   "Your email": "Твоё письмо",
