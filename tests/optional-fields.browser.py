@@ -82,6 +82,8 @@ class OptionalFieldsTests(unittest.TestCase):
                 visible = ['name'] if key == 'accountPause' else ['date', 'start']
                 if key == 'overtime':
                     visible.append('end')
+                if key == 'forgotCompletion':
+                    visible.append('details')
                 self.fields_are(visible, [] if key == 'accountPause' else ['date'])
 
     def test_apply_reload_and_reset_update_fields(self):

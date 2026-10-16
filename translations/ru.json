@@ -16,6 +16,8 @@
   "Damaged package — returned to the station": "Повреждённая посылка — возвращена на склад",
   "Undelivered packages — entries older than 2 months": "Недоставленные — записи старше 2 месяцев",
   "Delivered on time — incorrect late marks": "Доставлено вовремя — ошибочное опоздание",
+  "Delivered on time — forgot to confirm in app": "Доставлено вовремя — забыли подтвердить в приложении",
+  "For a package delivered on time but marked late because you forgot to complete the delivery in the app. Add the package ID, actual delivery time, and any supporting details if available.": "Для посылки, доставленной вовремя, но отмеченной как late delivery, потому что ты забыл завершить доставку в приложении. По возможности укажи номер посылки, фактическое время доставки и другие подтверждающие сведения.",
   "Late delivery — minor delay": "Небольшое опоздание",
   "Missing block payment": "Блок не оплачен",
   "Route exceeded the block time": "Маршрут занял больше времени",
