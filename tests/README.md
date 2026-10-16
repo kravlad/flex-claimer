@@ -26,7 +26,8 @@ The browser suite loads the built HTML through a local Playwright route; it need
 no server or external network access. Each test gets fresh browser storage. It
 checks default templates, template editing/reset/persistence, conditions and
 comments, required field validation, custom text fields, defaults and manual
-input priority (including cleared fields), plain and single-line JSON copying
-(including clipboard fallbacks), hidden values, manual
+input priority (including cleared fields), the copy menu, plain text, single-line
+JSON strings, JSON email objects with validated recipients (including clipboard
+fallbacks), hidden values, manual
 drafts, time field layout, and the Russian mobile form. Template syntax is documented in
 [template-fields.md](../docs/template-fields.md). It generates no email and sends nothing.

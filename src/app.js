@@ -204,8 +204,7 @@
     if(/\{\{[^{}]+\}\}/.test($('subject').value+'\n'+$('body').value)){setUiText('error','The email still contains template variables. Replace them with actual values.');return false;}
     return true;
   }
-  $('createEmail').addEventListener('click',()=>{
-    if(!validate())return;
+  function validatedRecipients(){
     const selectedInputs=selectedRecipientInputs();
     if(!selectedInputs.length){setUiText('error','Select an email recipient.');$('sendSupport').focus();return;}
     for(const input of selectedInputs){
@@ -216,6 +215,12 @@
     }
     const selectedRecipients=uniqueAddresses(selectedInputs);
     updateRecipientHint();
+    return selectedRecipients;
+  }
+  $('createEmail').addEventListener('click',()=>{
+    if(!validate())return;
+    const selectedRecipients=validatedRecipients();
+    if(!selectedRecipients)return;
     savePreferences();
     const subject=$('subject').value.replace(/[\r\n]+/g,' ');
     const body=$('body').value.replace(/\r?\n/g,'\r\n');
@@ -223,9 +228,21 @@
     const link=document.createElement('a');link.href=url;document.body.appendChild(link);link.click();link.remove();
     setUiText('actionStatus','Your mail app was requested to open. If no draft appeared, use Copy text.');
   });
-  async function copyBody(singleLine=false){
+  const copyMenu=$('copyMenu'),copyToggle=copyMenu.querySelector('summary');
+  document.addEventListener('click',event=>{if(!copyMenu.contains(event.target))copyMenu.open=false;});
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&copyMenu.open){event.preventDefault();copyMenu.open=false;copyToggle.focus();}
+  });
+  async function copyEmail(format='text'){
+    copyMenu.open=false;copyToggle.focus();
     if(!validate())return;
-    const text=singleLine?JSON.stringify($('body').value).replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'):$('body').value;
+    let text=$('body').value;
+    if(format==='object'){
+      const to=validatedRecipients();
+      if(!to)return;
+      text=JSON.stringify({to,subject:$('subject').value,body:text});
+    }else if(format==='line')text=JSON.stringify(text);
+    if(format!=='text')text=text.replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
     try {
       if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');
       await navigator.clipboard.writeText(text);
@@ -233,19 +250,21 @@
       const temp=document.createElement('textarea');temp.value=text;temp.style.cssText='position:fixed;top:0;left:0;opacity:0';temp.setAttribute('readonly','');document.body.appendChild(temp);temp.select();temp.setSelectionRange(0,temp.value.length);
       let success=false;try {success=document.execCommand('copy');}catch{}temp.remove();
       if(!success){
-        if(singleLine){
-          window.prompt(t('Copy this JSON string using Ctrl/Cmd+C:'),text);
-          setUiText('actionStatus','Automatic copying is unavailable. Copy the JSON string from the dialog.');
+        if(format!=='text'){
+          window.prompt(t('Copy this JSON using Ctrl/Cmd+C:'),text);
+          setUiText('actionStatus','Automatic copying is unavailable. Copy the JSON from the dialog.');
         }else{
           $('body').focus();$('body').select();setUiText('actionStatus','The text is selected. Copy it using the menu or Ctrl/Cmd+C.');
         }
         return;
       }
     }
-    setUiText('actionStatus',singleLine?'Email body copied as a single-line JSON string.':'Email body copied.');
+    const message=format==='object'?'Email copied as a JSON object.':format==='line'?'Email body copied as a single-line JSON string.':'Email body copied.';
+    setUiText('actionStatus',message);
   }
-  $('copy').addEventListener('click',()=>copyBody());
-  $('copyOneLine').addEventListener('click',()=>copyBody(true));
+  $('copy').addEventListener('click',()=>copyEmail());
+  $('copyOneLine').addEventListener('click',()=>copyEmail('line'));
+  $('copyJson').addEventListener('click',()=>copyEmail('object'));
   $('blockForm').addEventListener('submit',event=>{event.preventDefault();$('createEmail').click();});
   applyLanguage();updateRecipientHint();loadEditor();render();
 })();

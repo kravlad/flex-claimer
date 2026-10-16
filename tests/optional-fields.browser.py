@@ -76,6 +76,12 @@ class OptionalFieldsTests(unittest.TestCase):
         self.page.locator('#saveTemplate').click()
         self.assertEqual(self.page.locator('#templateSubject').input_value(), subject)
 
+    def copy_action(self, action):
+        toggle = self.page.locator('#copyMenu > summary')
+        self.assertEqual(toggle.count(), 1)
+        toggle.click()
+        self.page.locator(f'#{action}').click()
+
     def test_default_templates_show_only_referenced_optional_fields(self):
         for key in self.page.evaluate('Object.keys(FLEX_CLAIMER_DATA.templates)'):
             with self.subTest(template=key):
@@ -526,7 +532,7 @@ class OptionalFieldsTests(unittest.TestCase):
         body = self.page.locator('#body').input_value()
         button = self.page.locator('#copyOneLine')
         self.assertEqual(button.count(), 1)
-        button.click()
+        self.copy_action('copyOneLine')
         copied = self.page.evaluate('window.testCopied')
         self.assertEqual(json.loads(copied), body)
         self.assertFalse(any(char in copied for char in '\n\r\u2028\u2029'))
@@ -539,7 +545,7 @@ class OptionalFieldsTests(unittest.TestCase):
         });''')
         self.page.locator('#body').fill('First "quoted" line\nSecond line\\folder')
         body = self.page.locator('#body').input_value()
-        self.page.locator('#copy').click()
+        self.copy_action('copy')
         self.assertEqual(self.page.evaluate('window.testCopied'), body)
         self.assertEqual(self.page.locator('#actionStatus').inner_text(), 'Email body copied.')
 
@@ -556,7 +562,7 @@ class OptionalFieldsTests(unittest.TestCase):
         body = self.page.locator('#body').input_value()
         button = self.page.locator('#copyOneLine')
         self.assertEqual(button.count(), 1)
-        button.click()
+        self.copy_action('copyOneLine')
         self.assertEqual(json.loads(self.page.evaluate('window.testCopied')), body)
         self.assertIn('JSON', self.page.locator('#actionStatus').inner_text())
 
@@ -570,7 +576,7 @@ class OptionalFieldsTests(unittest.TestCase):
         body = self.page.locator('#body').input_value()
         button = self.page.locator('#copyOneLine')
         self.assertEqual(button.count(), 1)
-        button.click()
+        self.copy_action('copyOneLine')
         self.assertEqual(json.loads(self.page.evaluate('window.testPromptText')), body)
         self.assertEqual(self.page.locator('#body').input_value(), body)
         self.assertNotIn('copied', self.page.locator('#actionStatus').inner_text())
@@ -582,7 +588,7 @@ class OptionalFieldsTests(unittest.TestCase):
         self.page.locator('#date').fill('')
         button = self.page.locator('#copyOneLine')
         self.assertEqual(button.count(), 1)
-        button.click()
+        self.copy_action('copyOneLine')
         self.assertIsNone(self.page.evaluate('window.testCopied'))
         self.assertFalse(self.page.locator('#date').evaluate('el => el.checkValidity()'))
 
@@ -590,12 +596,115 @@ class OptionalFieldsTests(unittest.TestCase):
         self.page.locator('#language').select_option('ru')
         button = self.page.locator('#copyOneLine')
         self.assertEqual(button.count(), 1)
-        self.assertEqual(button.inner_text(), 'Копировать одной строкой')
+        toggle = self.page.locator('#copyMenu > summary')
+        self.assertEqual(toggle.count(), 1)
+        self.assertEqual(toggle.inner_text(), 'Копировать')
         for width in [900, 375]:
             with self.subTest(width=width):
                 self.page.set_viewport_size({'width': width, 'height': 900})
+                self.assertFalse(button.is_visible())
+                toggle.click()
                 self.assertTrue(button.is_visible())
+                self.assertEqual(button.inner_text(), 'Копировать одной строкой')
+                self.assertEqual(self.page.locator('#copyJson').inner_text(), 'Копировать как JSON-объект')
                 self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+                self.page.keyboard.press('Escape')
+
+    def test_copy_json_object_exports_selected_recipients_and_the_current_draft(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async text => {window.testCopied = text;}}
+        });''')
+        self.page.locator('#sendJeff').check()
+        self.page.locator('#sendCustom').check()
+        self.page.locator('#emailCustom').fill('driver@example.com')
+        self.page.locator('#subject').fill('Review "late" delivery — русский')
+        self.page.locator('#body').fill('First "quoted" line\\folder\nSecond\tline 😀')
+        subject = self.page.locator('#subject').input_value()
+        body = self.page.locator('#body').input_value()
+        self.copy_action('copyJson')
+        copied = json.loads(self.page.evaluate('window.testCopied'))
+        self.assertEqual(copied, {
+            'to': [self.page.locator('#emailSupport').input_value(), self.page.locator('#emailJeff').input_value(), 'driver@example.com'],
+            'subject': subject, 'body': body,
+        })
+        self.assertEqual(self.page.locator('#subject').input_value(), subject)
+        self.assertEqual(self.page.locator('#body').input_value(), body)
+        self.assertFalse(self.page.locator('#copyMenu').evaluate('el => el.open'))
+        self.assertEqual(self.page.locator('#actionStatus').inner_text(), 'Email copied as a JSON object.')
+
+    def test_copy_json_object_omits_unselected_and_duplicate_recipients(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async text => {window.testCopied = text;}}
+        });''')
+        self.page.locator('#sendCustom').check()
+        address = self.page.locator('#emailSupport').input_value()
+        self.page.locator('#emailCustom').fill(address.upper())
+        self.copy_action('copyJson')
+        self.assertEqual(json.loads(self.page.evaluate('window.testCopied'))['to'], [address])
+        self.page.locator('#sendSupport').uncheck()
+        self.page.locator('#emailCustom').fill('only@example.com')
+        self.copy_action('copyJson')
+        self.assertEqual(json.loads(self.page.evaluate('window.testCopied'))['to'], ['only@example.com'])
+
+    def test_copy_json_object_requires_selected_valid_recipients(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async text => {window.testCopied = text;}}
+        });''')
+        self.page.locator('#sendSupport').uncheck()
+        self.copy_action('copyJson')
+        self.assertIsNone(self.page.evaluate('window.testCopied'))
+        self.assertEqual(self.page.locator('#error').inner_text(), 'Select an email recipient.')
+        self.page.locator('#sendCustom').check()
+        for address in ['', 'not-an-address']:
+            with self.subTest(address=address):
+                self.page.locator('#emailCustom').fill(address)
+                self.copy_action('copyJson')
+                self.assertIsNone(self.page.evaluate('window.testCopied'))
+                self.assertFalse(self.page.locator('#emailCustom').evaluate('el => el.checkValidity()'))
+
+    def test_copy_json_object_fallback_copies_the_complete_object(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {configurable: true, value: undefined});
+        document.execCommand = () => {window.testCopied = document.activeElement.value; return true;};''')
+        self.copy_action('copyJson')
+        copied = json.loads(self.page.evaluate('window.testCopied'))
+        self.assertEqual(copied['to'], [self.page.locator('#emailSupport').input_value()])
+        self.assertEqual(copied['subject'], self.page.locator('#subject').input_value())
+        self.assertEqual(copied['body'], self.page.locator('#body').input_value())
+
+    def test_copy_json_object_manual_fallback_offers_the_complete_object(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {configurable: true, value: undefined});
+        document.execCommand = () => false;
+        window.prompt = (message, text) => {window.testPromptText = text; return null;};''')
+        self.copy_action('copyJson')
+        copied = json.loads(self.page.evaluate('window.testPromptText'))
+        self.assertEqual(copied['body'], self.page.locator('#body').input_value())
+        self.assertEqual(copied['to'], [self.page.locator('#emailSupport').input_value()])
+        self.assertNotIn('copied', self.page.locator('#actionStatus').inner_text())
+
+    def test_copy_menu_supports_keyboard_and_dismissal(self):
+        toggle = self.page.locator('#copyMenu > summary')
+        self.assertEqual(toggle.count(), 1)
+        self.assertFalse(self.page.locator('#copyOneLine').is_visible())
+        self.assertFalse(self.page.locator('#copyJson').is_visible())
+        toggle.focus()
+        toggle.press('Enter')
+        self.assertTrue(self.page.locator('#copyJson').is_visible())
+        toggle.press('Tab')
+        self.assertTrue(self.page.locator('#copy').evaluate('el => el === document.activeElement'))
+        self.page.keyboard.press('Escape')
+        self.assertFalse(self.page.locator('#copyJson').is_visible())
+        self.assertTrue(toggle.evaluate('el => el === document.activeElement'))
+        toggle.press('Space')
+        self.assertTrue(self.page.locator('#copyJson').is_visible())
+        for _ in range(4):
+            self.page.keyboard.press('Tab')
+        self.assertTrue(self.page.locator('.help > summary').evaluate('el => el === document.activeElement'))
+        self.page.keyboard.press('Escape')
+        self.assertFalse(self.page.locator('#copyJson').is_visible())
+        self.assertTrue(toggle.evaluate('el => el === document.activeElement'))
+        toggle.press('Enter')
+        self.page.locator('#emailHeading').click()
+        self.assertFalse(self.page.locator('#copyJson').is_visible())
 
     def test_conflicting_defaults_are_rejected_without_changing_the_active_template(self):
         self.apply_template('Day {{weekday "Monday"}}', 'Day {{weekday}}')
