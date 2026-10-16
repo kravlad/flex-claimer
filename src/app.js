@@ -223,19 +223,29 @@
     const link=document.createElement('a');link.href=url;document.body.appendChild(link);link.click();link.remove();
     setUiText('actionStatus','Your mail app was requested to open. If no draft appeared, use Copy text.');
   });
-  $('copy').addEventListener('click',async()=>{
+  async function copyBody(singleLine=false){
     if(!validate())return;
-    const text=$('body').value;
+    const text=singleLine?JSON.stringify($('body').value).replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'):$('body').value;
     try {
       if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');
       await navigator.clipboard.writeText(text);
     } catch {
       const temp=document.createElement('textarea');temp.value=text;temp.style.cssText='position:fixed;top:0;left:0;opacity:0';temp.setAttribute('readonly','');document.body.appendChild(temp);temp.select();temp.setSelectionRange(0,temp.value.length);
       let success=false;try {success=document.execCommand('copy');}catch{}temp.remove();
-      if(!success){$('body').focus();$('body').select();setUiText('actionStatus','The text is selected. Copy it using the menu or Ctrl/Cmd+C.');return;}
+      if(!success){
+        if(singleLine){
+          window.prompt(t('Copy this JSON string using Ctrl/Cmd+C:'),text);
+          setUiText('actionStatus','Automatic copying is unavailable. Copy the JSON string from the dialog.');
+        }else{
+          $('body').focus();$('body').select();setUiText('actionStatus','The text is selected. Copy it using the menu or Ctrl/Cmd+C.');
+        }
+        return;
+      }
     }
-    setUiText('actionStatus','Email body copied.');
-  });
+    setUiText('actionStatus',singleLine?'Email body copied as a single-line JSON string.':'Email body copied.');
+  }
+  $('copy').addEventListener('click',()=>copyBody());
+  $('copyOneLine').addEventListener('click',()=>copyBody(true));
   $('blockForm').addEventListener('submit',event=>{event.preventDefault();$('createEmail').click();});
   applyLanguage();updateRecipientHint();loadEditor();render();
 })();

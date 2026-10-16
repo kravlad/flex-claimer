@@ -1,4 +1,5 @@
 """Browser regression checks; build dist/index.html before running this file."""
+import json
 import re
 import shutil
 import unittest
@@ -516,6 +517,85 @@ class OptionalFieldsTests(unittest.TestCase):
         self.page.locator('#regenerate').click()
         self.assertEqual(self.page.locator('#start').input_value(), '')
         self.assertEqual(self.page.locator('#subject').input_value(), 'Request October 2, 2026')
+
+    def test_copy_one_line_produces_a_json_string_without_changing_the_draft(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async text => {window.testCopied = text;}}
+        });''')
+        self.page.locator('#body').fill('First "quoted" line\\folder\nSecond\tline\nРусский 😀\u2028Next\u2029End')
+        body = self.page.locator('#body').input_value()
+        button = self.page.locator('#copyOneLine')
+        self.assertEqual(button.count(), 1)
+        button.click()
+        copied = self.page.evaluate('window.testCopied')
+        self.assertEqual(json.loads(copied), body)
+        self.assertFalse(any(char in copied for char in '\n\r\u2028\u2029'))
+        self.assertEqual(self.page.locator('#body').input_value(), body)
+        self.assertIn('JSON', self.page.locator('#actionStatus').inner_text())
+
+    def test_regular_copy_keeps_the_original_multiline_text(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async text => {window.testCopied = text;}}
+        });''')
+        self.page.locator('#body').fill('First "quoted" line\nSecond line\\folder')
+        body = self.page.locator('#body').input_value()
+        self.page.locator('#copy').click()
+        self.assertEqual(self.page.evaluate('window.testCopied'), body)
+        self.assertEqual(self.page.locator('#actionStatus').inner_text(), 'Email body copied.')
+
+    def test_copy_one_line_falls_back_to_copying_the_serialized_text(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async () => {throw new Error('Denied');}}
+        });
+        document.execCommand = command => {
+          if (command !== 'copy') return false;
+          window.testCopied = document.activeElement.value;
+          return true;
+        };''')
+        self.page.locator('#body').fill('First "quoted" line\nSecond line')
+        body = self.page.locator('#body').input_value()
+        button = self.page.locator('#copyOneLine')
+        self.assertEqual(button.count(), 1)
+        button.click()
+        self.assertEqual(json.loads(self.page.evaluate('window.testCopied')), body)
+        self.assertIn('JSON', self.page.locator('#actionStatus').inner_text())
+
+    def test_copy_one_line_offers_the_json_string_when_both_clipboard_methods_fail(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async () => {throw new Error('Denied');}}
+        });
+        document.execCommand = () => false;
+        window.prompt = (message, text) => {window.testPromptText = text; return null;};''')
+        self.page.locator('#body').fill('First "quoted" line\nSecond line')
+        body = self.page.locator('#body').input_value()
+        button = self.page.locator('#copyOneLine')
+        self.assertEqual(button.count(), 1)
+        button.click()
+        self.assertEqual(json.loads(self.page.evaluate('window.testPromptText')), body)
+        self.assertEqual(self.page.locator('#body').input_value(), body)
+        self.assertNotIn('copied', self.page.locator('#actionStatus').inner_text())
+
+    def test_copy_one_line_checks_required_fields_before_copying(self):
+        self.page.evaluate('''Object.defineProperty(navigator, 'clipboard', {
+          configurable: true, value: {writeText: async text => {window.testCopied = text;}}
+        });''')
+        self.page.locator('#date').fill('')
+        button = self.page.locator('#copyOneLine')
+        self.assertEqual(button.count(), 1)
+        button.click()
+        self.assertIsNone(self.page.evaluate('window.testCopied'))
+        self.assertFalse(self.page.locator('#date').evaluate('el => el.checkValidity()'))
+
+    def test_copy_one_line_is_translated_and_fits_narrow_layouts(self):
+        self.page.locator('#language').select_option('ru')
+        button = self.page.locator('#copyOneLine')
+        self.assertEqual(button.count(), 1)
+        self.assertEqual(button.inner_text(), 'Копировать одной строкой')
+        for width in [900, 375]:
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                self.assertTrue(button.is_visible())
+                self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
 
     def test_conflicting_defaults_are_rejected_without_changing_the_active_template(self):
         self.apply_template('Day {{weekday "Monday"}}', 'Day {{weekday}}')
