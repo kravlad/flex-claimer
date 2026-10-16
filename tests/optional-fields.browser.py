@@ -89,7 +89,7 @@ class OptionalFieldsTests(unittest.TestCase):
                 visible = ['name'] if key == 'accountPause' else ['date', 'start']
                 if key == 'overtime':
                     visible.append('end')
-                if key == 'forgotCompletion':
+                if key in ['forgotCompletion', 'customerNotReceived']:
                     visible.append('details')
                 self.fields_are(visible, [] if key == 'accountPause' else ['date'])
 

@@ -12,6 +12,8 @@
   "Undelivered packages — route exceeded the block": "Недоставленные — маршрут не уложился в блок",
   "Undelivered packages — no access after 8 PM": "Недоставленные — нет доступа после 20:00",
   "Undelivered packages — no access, customer did not answer": "Недоставленные — нет доступа, клиент не ответил",
+  "Customer reports package not received — delivered as instructed": "Клиент не получил посылку — доставка по инструкции",
+  "For a package reported as not received after delivery to the correct address and instructed location. Add the package ID and delivery details if available.": "Для записи о неполучении посылки клиентом после доставки по правильному адресу и в указанное место. По возможности укажи номер посылки и обстоятельства доставки.",
   "For packages undelivered because there was no access and the customer did not answer your call. Describe the delivery attempt.": "Для недоставленных посылок из-за отсутствия доступа, когда клиент не ответил на звонок. Укажи обстоятельства попытки доставки.",
   "Damaged package — returned to the station": "Повреждённая посылка — возвращена на склад",
   "Undelivered packages — entries older than 2 months": "Недоставленные — записи старше 2 месяцев",
